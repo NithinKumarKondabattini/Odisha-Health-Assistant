@@ -3,286 +3,2532 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Odisha Health Assistant - AI Healthcare Chatbot</title>
+    <title>Odisha Health Assistant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
         }
-        
-        .container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            max-width: 800px;
+
+        .page-section {
+            display: none;
+        }
+
+        .active-page {
+            display: block;
+        }
+       
+        .nav-link.active {
+            color: #00bf8b;
+            font-weight: 600;
+        }
+
+        /* Custom styles for glowing button */
+        .glowing-btn {
+            position: relative;
+            background-color: #00bf8b;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .glowing-btn:hover {
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .glowing-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
             width: 100%;
-            overflow: hidden;
+            height: 100%;
+            background: rgba(0, 191, 139, 0.5);
+            border-radius: 9999px;
+            transform: translate(-50%, -50%);
+            animation: pulse 2s infinite cubic-bezier(0.66, 0, 0, 1);
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
-        
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+       
+        .glowing-btn:hover::before {
+            opacity: 1;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.7;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1.5);
+                opacity: 0;
+            }
+        }
+       
+       /* Custom styles for floating chat bubble */
+.chat-bubble {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 1.5rem;   /* stays left side */
+    background-color: #00bf8b;
+    color: white;
+    border-radius: 50%;
+    padding: 0.6rem;   /* smaller padding */
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease-in-out;
+    cursor: pointer;
+    z-index: 50;
+    width: 45px;       /* fixed size */
+    height: 45px;      /* fixed size */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chat-bubble i {
+    font-size: 1.3rem; /* smaller icon */
+}
+
+.chat-bubble:hover {
+    transform: scale(1.1);
+}
+
+        /* Custom styles for floating chat bubble */
+.chat-bubble {
+    position: fixed;
+    bottom: 1rem;
+    left: 1rem;        background-color: #00bf8b;
+    color: white;
+    border-radius: 9999px;
+    padding: 1rem;
+    box-shadow: 0 10px 15px rgba(0, 0.2);
+    transition: transform 0.3s ease-in-out;
+    cursor: pointer;
+    z-index: 20;
+}
+
+.chat-bubble:hover {
+    transform: scale(1.1);
+}
+
+
+        .symptom-btn.active {
+            background-color: #00bf8b;
             color: white;
-            padding: 30px;
-            text-align: center;
         }
-        
-        .header h1 {
-            font-size: 28px;
-            margin-bottom: 10px;
-        }
-        
-        .header p {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-        
-        .chat-container {
-            height: 500px;
-            overflow-y: auto;
-            padding: 20px;
-            background: #f5f5f5;
-        }
-        
-        .message {
-            margin-bottom: 15px;
-            display: flex;
-            align-items: flex-start;
-        }
-        
-        .message.user {
-            justify-content: flex-end;
-        }
-        
-        .message-content {
-            max-width: 70%;
-            padding: 12px 18px;
-            border-radius: 18px;
-            word-wrap: break-word;
-        }
-        
-        .message.bot .message-content {
-            background: white;
-            color: #333;
-            border: 1px solid #e0e0e0;
-        }
-        
-        .message.user .message-content {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+        .service-type-btn.active {
+            background-color: #00bf8b;
             color: white;
+            border-color: #00bf8b;
         }
-        
-        .input-area {
-            padding: 20px;
-            background: white;
-            border-top: 1px solid #e0e0e0;
-            display: flex;
-            gap: 10px;
-        }
-        
-        #userInput {
-            flex: 1;
-            padding: 12px 20px;
-            border: 2px solid #e0e0e0;
-            border-radius: 25px;
-            font-size: 14px;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-        
-        #userInput:focus {
-            border-color: #667eea;
-        }
-        
-        #sendBtn {
-            padding: 12px 30px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+        .notification-box {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #00bf8b;
             color: white;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
-            transition: transform 0.2s;
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
         }
-        
-        #sendBtn:hover {
-            transform: scale(1.05);
-        }
-        
-        .quick-actions {
-            padding: 15px 20px;
-            background: white;
-            border-top: 1px solid #e0e0e0;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        
-        .quick-btn {
-            padding: 8px 16px;
-            background: #f0f0f0;
-            border: 1px solid #d0d0d0;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: all 0.3s;
-        }
-        
-        .quick-btn:hover {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
-        }
-        
-        .footer {
-            background: #f8f8f8;
-            padding: 15px;
-            text-align: center;
-            font-size: 12px;
-            color: #666;
-            border-top: 1px solid #e0e0e0;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .message {
-            animation: fadeIn 0.3s ease-out;
+
+        .notification-box.show {
+            display: block;
+            opacity: 1;
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>🏥 Odisha Health Assistant</h1>
-            <p>Your AI-powered healthcare companion for Odisha</p>
-        </div>
-        
-        <div class="chat-container" id="chatContainer">
-            <div class="message bot">
-                <div class="message-content">
-                    Hello! I'm your Odisha Health Assistant. I can help you with:
-                    <br>• Symptom analysis and health advice
-                    <br>• Vaccination schedules and tracking
-                    <br>• Hospital and doctor information
-                    <br>• Appointment booking assistance
-                    <br>• Health tips and preventive care
-                    <br><br>How can I assist you today?
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-[#00bf8b]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span class="font-bold text-lg text-gray-700">Odisha Health Assistant</span>
+            </div>
+            <div class="flex items-center space-x-6 hidden lg:flex">
+                <a href="#home" onclick="showPage('home')" class="nav-link text-gray-600 hover:text-[#00bf8b] transition duration-200">Home</a>
+                <a href="#prevention" onclick="showPage('prevention')" class="nav-link text-gray-600 hover:text-[#00bf8b] transition duration-200">Prevention</a>
+                <a href="#vaccines" onclick="showPage('vaccines')" class="nav-link text-gray-600 hover:text-[#00bf8b] transition duration-200">Vaccines</a>
+                <a href="#appointments" onclick="showPage('appointments')" class="nav-link text-gray-600 hover:text-[#00bf8b] transition duration-200">Appointments</a>
+                <a href="#symptoms" onclick="showPage('symptoms')" class="nav-link text-gray-600 hover:text-[#00bf8b] transition duration-200">Symptoms</a>
+                <a href="#ai-analysis" onclick="showPage('ai-analysis')" class="nav-link text-gray-600 hover:text-[#00bf8b] transition duration-200">AI Analysis</a>
+                <a href="#services" onclick="showPage('services')" class="nav-link text-gray-600 hover:text-[#00bf8b] transition duration-200">Services</a>
+                <a href="#dashboard" onclick="showPage('dashboard')" class="nav-link text-gray-600 hover:text-[#00bf8b] transition duration-200">Dashboard</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-1 text-red-500 font-bold">
+                    <i class="fas fa-phone-alt"></i>
+                    <span>108</span>
+                </div>
+                <select class="rounded-md border border-gray-300 p-2 text-sm bg-gray-50">
+                    <option>English</option>
+                    <option>Odia</option>
+                    <option>Hindi</option>
+                </select>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+
+        <!-- Health Alert Banner (visible on all pages) -->
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-md shadow-sm flex justify-between items-center mb-6">
+            <div class="flex items-center">
+                <i class="fas fa-exclamation-triangle text-yellow-500 mr-3"></i>
+                <div>
+                    <p class="font-bold text-yellow-800">Health Alert - Dengue Cases Rising</p>
+                    <p class="text-yellow-700 text-sm mt-1">Increased dengue cases reported in Cuttack and Bhubaneswar. Remove standing water from containers, use mosquito repellents, and seek immediate medical attention for high fever. <a href="#" class="text-yellow-900 font-semibold underline">Learn More</a></p>
                 </div>
             </div>
+
+            <button class="text-yellow-700 hover:text-yellow-900 transition duration-200">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
-        
-        <div class="quick-actions">
-            <button class="quick-btn" onclick="quickMessage('Check symptoms')">🔍 Check Symptoms</button>
-            <button class="quick-btn" onclick="quickMessage('Vaccination schedule')">💉 Vaccination Info</button>
-            <button class="quick-btn" onclick="quickMessage('Find hospitals')">🏥 Find Hospitals</button>
-            <button class="quick-btn" onclick="quickMessage('Book appointment')">📅 Book Appointment</button>
-        </div>
-        
-        <div class="input-area">
-            <input type="text" id="userInput" placeholder="Type your health question here..." onkeypress="handleKeyPress(event)">
-            <button id="sendBtn" onclick="sendMessage()">Send</button>
-        </div>
-        
-        <div class="footer">
-            © 2025 Odisha Health Assistant | Developed by Nithin Kumar Kondabattini | For informational purposes only
-        </div>
+
+        <!-- Home Page Section -->
+        <section id="home" class="page-section active-page">
+            <div class="flex flex-col lg:flex-row items-center justify-between py-12">
+                <div class="lg:w-1/2 text-center lg:text-left mb-8 lg:mb-0">
+                    <span class="text-sm font-semibold text-gray-500">Government of Odisha Health Initiative</span>
+                    <h1 class="text-5xl font-extrabold text-gray-900 leading-tight mt-2">Your Preventive Health Assistant</h1>
+                    <p class="mt-4 text-lg text-gray-600">Comprehensive healthcare guidance, vaccination tracking, AI-powered symptom analysis, and instant access to health services across Odisha.</p>
+                    <div class="mt-8 flex justify-center lg:justify-start space-x-4">
+                        <button class="glowing-btn" onclick="showPage('symptoms')">Start Health Check <i class="fas fa-arrow-right ml-2"></i></button>
+                        <button onclick="showPage('vaccines')" class="bg-white text-gray-700 hover:bg-gray-100 border border-gray-300 rounded-full px-8 py-3 font-semibold transition duration-300">View Vaccination Schedule</button>
+                    </div>
+                    <div class="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
+                        <div class="p-6 bg-white rounded-xl shadow-lg flex flex-col items-center">
+                            <span class="text-4xl text-[#00bf8b]">98%</span>
+                            <p class="mt-2 text-gray-600">Vaccination Coverage</p>
+                        </div>
+                        <div class="p-6 bg-white rounded-xl shadow-lg flex flex-col items-center">
+                            <span class="text-4xl text-[#00bf8b]">50M+</span>
+                            <p class="mt-2 text-gray-600">People Served</p>
+                        </div>
+
+                        <div class="p-6 bg-white rounded-xl shadow-lg flex flex-col items-center">
+                            <span class="text-4xl text-[#00bf8b]">24/7</span>
+                            <p class="mt-2 text-gray-600">Health Support</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:w-1/2 flex justify-center">
+                    <div class="relative w-full max-w-lg aspect-square rounded-3xl bg-gradient-to-br from-green-200 to-blue-200 p-4">
+                        <div class="absolute top-4 left-4 bg-white rounded-lg p-3 shadow-md flex items-center space-x-2">
+                            <i class="fas fa-robot text-[#00bf8b]"></i>
+                            <span class="font-semibold text-sm">AI Assistant</span>
+                            <span class="text-gray-500 text-xs">Always ready to help</span>
+                        </div>
+                        <div class="absolute bottom-4 left-4 bg-white rounded-lg p-3 shadow-md flex items-center space-x-2">
+                            <i class="fas fa-lock text-[#00bf8b]"></i>
+
+
+                            <span class="font-semibold text-sm">Secure & Private</span>
+                            <span class="text-gray-500 text-xs">Your data is protected</span>
+
+<!-- Floating Chatbot Start -->
+<div id="chatbotIcon" style="position:fixed;bottom:20px;right:20px;
+  width:60px;height:60px;border-radius:50%;background:#0066cc;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,0.2);z-index:9999">
+  <img src="https://cdn-icons-png.flaticon.com/512/4712/4712109.png"
+       alt="Chatbot" style="width:32px;height:32px;">
+</div>
+
+<div id="chatbotWindow" style="position:fixed;bottom:90px;right:20px;
+  width:320px;max-height:420px;background:#fff;border-radius:10px;
+  box-shadow:0 6px 18px rgba(0,0,0,0.25);overflow:hidden;
+  display:none;flex-direction:column;z-index:9999;font-family:Arial, sans-serif">
+
+  <div style="background:#0066cc;color:#fff;padding:10px;
+    display:flex;justify-content:space-between;align-items:center">
+    <span style="font-weight:bold">AI Symptom Chatbot</span>
+    <button id="closeBtn" style="background:none;border:none;color:white;
+      font-size:18px;cursor:pointer">✕</button>
+  </div>
+
+  <div id="chatArea" style="flex:1;padding:10px;overflow-y:auto;
+    background:#fafafa;font-size:14px;line-height:1.4"></div>
+
+  <div style="padding:8px;border-top:1px solid #ddd;background:#f9f9f9">
+    <textarea id="symptomsInput" placeholder="Type your symptoms..."
+      style="width:100%;height:50px;padding:6px;border:1px solid #ccc;
+      border-radius:6px;resize:none;font-size:14px"></textarea>
+    <button id="checkBtn" style="margin-top:6px;width:100%;padding:8px;
+      border:0;background:#0066cc;color:white;border-radius:6px;
+      cursor:pointer;font-size:14px">Send</button>
+  </div>
+</div>
+
+<script>
+  // Toggle open/close
+  const icon=document.getElementById("chatbotIcon");
+  const windowBox=document.getElementById("chatbotWindow");
+  const closeBtn=document.getElementById("closeBtn");
+
+  icon.addEventListener("click",()=>{ windowBox.style.display="flex"; });
+  closeBtn.addEventListener("click",()=>{ windowBox.style.display="none"; });
+
+  // === EXPANDED SYMPTOM DATABASE ===
+  const SYMPTOM_DB = {
+    "fever": [
+      {name:"Flu", meds:"Paracetamol, fluids", precautions:"Rest, hydration"},
+      {name:"Covid-19", meds:"Paracetamol, Vitamin C, Zinc", precautions:"Isolate, wear mask"},
+      {name:"Malaria", meds:"Antimalarial drugs (doctor prescribed)", precautions:"Mosquito protection"},
+      {name:"Pneumonia", meds:"Antibiotics (doctor prescribed)", precautions:"Doctor visit mandatory"}
+    ],
+    "cold": [
+      {name:"Common Cold", meds:"Paracetamol, antihistamines", precautions:"Warm fluids, rest"},
+      {name:"Allergy", meds:"Antihistamines", precautions:"Avoid allergens"},
+      {name:"Flu", meds:"Paracetamol", precautions:"Rest, fluids"}
+    ],
+    "cough": [
+      {name:"Common Cold", meds:"Cough syrup", precautions:"Warm drinks"},
+      {name:"Covid-19", meds:"Paracetamol, cough syrup", precautions:"Isolation"},
+      {name:"Asthma", meds:"Inhaler (doctor prescribed)", precautions:"Avoid dust"},
+      {name:"Pneumonia", meds:"Antibiotics", precautions:"See doctor quickly"}
+    ],
+    "headache": [
+      {name:"Migraine", meds:"Painkillers", precautions:"Dark room, avoid triggers"},
+      {name:"Tension headache", meds:"Paracetamol", precautions:"Stress relief"},
+      {name:"Dehydration", meds:"ORS, fluids", precautions:"Hydrate regularly"}
+    ],
+    "sore throat": [
+      {name:"Tonsillitis", meds:"Antibiotics (doctor prescribed)", precautions:"Warm saltwater gargle"},
+      {name:"Common Cold", meds:"Paracetamol, lozenges", precautions:"Steam inhalation"},
+      {name:"Covid-19", meds:"Paracetamol, warm water", precautions:"Isolate"}
+    ],
+    "fatigue": [
+      {name:"Anemia", meds:"Iron supplements", precautions:"Iron-rich foods"},
+      {name:"Thyroid disorder", meds:"Thyroid medicine (doctor prescribed)", precautions:"Regular checkups"},
+      {name:"Flu", meds:"Paracetamol, fluids", precautions:"Rest"}
+    ],
+    "stomach pain": [
+      {name:"Gastritis", meds:"Antacids", precautions:"Avoid spicy foods"},
+      {name:"Food poisoning", meds:"ORS, rest", precautions:"Hydration"},
+      {name:"Gastroenteritis", meds:"ORS, paracetamol", precautions:"Fluids, hygiene"}
+    ],
+    "diarrhea": [
+      {name:"Food poisoning", meds:"ORS, zinc tablets", precautions:"Hydration"},
+      {name:"Gastroenteritis", meds:"ORS, paracetamol", precautions:"Rest, fluids"},
+      {name:"Cholera", meds:"ORS, antibiotics (doctor prescribed)", precautions:"Immediate medical help"}
+    ],
+    "vomiting": [
+      {name:"Gastroenteritis", meds:"ORS, paracetamol", precautions:"Rest, hydration"},
+      {name:"Food poisoning", meds:"ORS, antiemetic (doctor prescribed)", precautions:"Avoid outside food"}
+    ],
+    "leg pain": [
+      {name:"Muscle strain", meds:"Ibuprofen, rest", precautions:"Ice pack"},
+      {name:"Sprain", meds:"Painkillers, bandage", precautions:"Elevate leg"},
+      {name:"DVT", meds:"Blood thinners (doctor prescribed)", precautions:"Emergency care"}
+    ],
+    "swelling": [
+      {name:"Injury", meds:"Painkillers, cold compress", precautions:"Rest"},
+      {name:"Infection", meds:"Antibiotics", precautions:"Doctor check"},
+      {name:"Allergic reaction", meds:"Antihistamines", precautions:"Avoid allergen"}
+    ],
+    "chest pain": [
+      {name:"Heart attack", meds:"Aspirin (emergency)", precautions:"Call ambulance"},
+      {name:"Angina", meds:"Nitrates (doctor prescribed)", precautions:"Avoid exertion"},
+      {name:"Pneumonia", meds:"Antibiotics", precautions:"Doctor consultation"}
+    ],
+    "shortness of breath": [
+      {name:"Asthma", meds:"Inhaler", precautions:"Avoid dust/allergens"},
+      {name:"Covid-19", meds:"Paracetamol, oxygen if low", precautions:"Isolate"},
+      {name:"Pneumonia", meds:"Antibiotics", precautions:"Urgent doctor care"}
+    ],
+    "dizziness": [
+      {name:"Low blood pressure", meds:"ORS, salt water", precautions:"Lie down"},
+      {name:"Dehydration", meds:"Fluids", precautions:"Drink water"},
+      {name:"Anemia", meds:"Iron supplements", precautions:"Iron foods"}
+    ],
+    "back pain": [
+      {name:"Muscle strain", meds:"Ibuprofen, rest", precautions:"Avoid lifting"},
+      {name:"Slip disc", meds:"Painkillers (doctor prescribed)", precautions:"Physiotherapy"},
+      {name:"Arthritis", meds:"Anti-inflammatory drugs", precautions:"Exercise, posture care"}
+    ]
+  };
+
+  // === PHRASES ===
+  const PHRASES = {
+    "temperature":"fever","feverish":"fever","high temp":"fever","shivering":"fever","chills":"fever",
+    "runny nose":"cold","blocked nose":"cold","sneezing":"cold",
+    "dry cough":"cough","wet cough":"cough","coughing":"cough","phlegm":"cough",
+    "head pain":"headache","my head hurts":"headache","throbbing head":"headache","migraine":"headache",
+    "throat pain":"sore throat","throat hurting":"sore throat","difficulty swallowing":"sore throat",
+    "tired":"fatigue","weak":"fatigue","exhausted":"fatigue","low energy":"fatigue",
+    "abdominal pain":"stomach pain","belly pain":"stomach pain","gastric":"stomach pain",
+    "loose motions":"diarrhea","frequent stools":"diarrhea",
+    "throwing up":"vomiting","nausea":"vomiting","feeling sick":"vomiting",
+    "legs paining":"leg pain","leg hurts":"leg pain","cramps in leg":"leg pain","aching legs":"leg pain",
+    "swollen leg":"swelling","ankle swelling":"swelling","hands swollen":"swelling","puffy":"swelling",
+    "chest hurts":"chest pain","pain in chest":"chest pain","tight chest":"chest pain","pressure in chest":"chest pain",
+    "breathless":"shortness of breath","can’t breathe":"shortness of breath",
+    "difficulty breathing":"shortness of breath","hard to breathe":"shortness of breath",
+    "feeling faint":"dizziness","lightheaded":"dizziness","giddy":"dizziness",
+    "spine pain":"back pain","lower back pain":"back pain","my back hurts":"back pain"
+  };
+
+  function extractSymptoms(text){
+    const found=new Set();
+    const lower=text.toLowerCase();
+    for(const sym in SYMPTOM_DB){ if(lower.includes(sym)) found.add(sym); }
+    for(const phrase in PHRASES){ if(lower.includes(phrase)) found.add(PHRASES[phrase]); }
+    return Array.from(found);
+  }
+
+  document.getElementById("checkBtn").addEventListener("click",()=>{
+    const text=document.getElementById("symptomsInput").value.trim();
+    const chat=document.getElementById("chatArea");
+    if(!text) return;
+
+    // User message
+    chat.innerHTML+=`<div style="text-align:right;margin:4px 0">
+      <span style="display:inline-block;background:#0066cc;color:#fff;
+      padding:6px 9px;border-radius:6px">${text}</span></div>`;
+
+    const detected=extractSymptoms(text);
+    let reply="";
+
+    if(detected.length===0){
+      reply="<p>No recognizable symptoms found. Try rephrasing.</p>";
+    } else {
+      detected.forEach(sym=>{
+        if(SYMPTOM_DB[sym]){
+          reply+=`<h4 style="margin:6px 0;font-size:15px">Symptom: ${sym}</h4>`;
+          SYMPTOM_DB[sym].forEach(cond=>{
+            reply+=`<p><b>${cond.name}</b><br>
+              💊 ${cond.meds}<br>
+              ⚠️ ${cond.precautions}</p>`;
+          });
+        }
+      });
+    }
+
+    // Bot message
+    chat.innerHTML+=`<div style="text-align:left;margin:4px 0">
+      <span style="display:inline-block;background:#eee;color:#000;
+      padding:6px 9px;border-radius:6px;max-width:90%">${reply}</span></div>`;
+
+    chat.scrollTop=chat.scrollHeight;
+    document.getElementById("symptomsInput").value="";
+  });
+</script>
+<!-- Floating Chatbot End -->
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Prevention Page Section -->
+        <section id="prevention" class="page-section">
+            <h2 class="text-4xl font-bold text-center mb-2 text-gray-900">
+                <i class="fas fa-bolt text-[#00bf8b] mr-2"></i>Quick Health Tips
+            </h2>
+            <p class="text-center text-gray-600 mb-12">Essential preventive care tips for common health issues in Odisha. Click on any tip to learn more about prevention and care.</p>
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+                <button class="bg-red-500 text-white rounded-lg p-6 flex flex-col items-center justify-center text-center shadow-lg transform transition duration-300 hover:scale-105" onclick="showTip('dengue')">
+                    <i class="fas fa-mosquito-net text-4xl mb-2"></i>
+                    <p class="font-semibold text-sm">Dengue Prevention</p>
+                </button>
+                <button class="bg-blue-500 text-white rounded-lg p-6 flex flex-col items-center justify-center text-center shadow-lg transform transition duration-300 hover:scale-105" onclick="showTip('diarrhea')">
+                    <i class="fas fa-toilet text-4xl mb-2"></i>
+                    <p class="font-semibold text-sm">Diarrhea Care</p>
+                </button>
+                <button class="bg-gray-700 text-white rounded-lg p-6 flex flex-col items-center justify-center text-center shadow-lg transform transition duration-300 hover:scale-105" onclick="showTip('covid')">
+                    <i class="fas fa-virus text-4xl mb-2"></i>
+                    <p class="font-semibold text-sm">COVID Protection</p>
+                </button>
+                <button class="bg-pink-500 text-white rounded-lg p-6 flex flex-col items-center justify-center text-center shadow-lg transform transition duration-300 hover:scale-105" onclick="showTip('maternal')">
+                    <i class="fas fa-baby text-4xl mb-2"></i>
+                    <p class="font-semibold text-sm">Maternal Care</p>
+                </button>
+                <button class="bg-[#00bf8b] text-white rounded-lg p-6 flex flex-col items-center justify-center text-center shadow-lg transform transition duration-300 hover:scale-105" onclick="showTip('vaccination')">
+                    <i class="fas fa-syringe text-4xl mb-2"></i>
+                    <p class="font-semibold text-sm">Vaccination</p>
+                </button>
+                <button class="bg-purple-500 text-white rounded-lg p-6 flex flex-col items-center justify-center text-center shadow-lg transform transition duration-300 hover:scale-105" onclick="showTip('malaria')">
+                    <i class="fas fa-disease text-4xl mb-2"></i>
+                    <p class="font-semibold text-sm">Malaria Prevention</p>
+                </button>
+                <button class="bg-teal-500 text-white rounded-lg p-6 flex flex-col items-center justify-center text-center shadow-lg transform transition duration-300 hover:scale-105" onclick="showTip('personal_hygiene')">
+                    <i class="fas fa-hands-wash text-4xl mb-2"></i>
+                    <p class="font-semibold text-sm">Personal Hygiene</p>
+                </button>
+            </div>
+
+            <!-- Tip Details Display Section -->
+            <div id="tip-display" class="hidden mt-12 bg-white p-8 rounded-2xl shadow-lg opacity-0 transition-opacity duration-500">
+                <h3 id="tip-title" class="text-xl font-bold text-gray-800 mb-4"></h3>
+                <p id="tip-content" class="text-gray-600"></p>
+            </div>
+        </section>
+       
+        <!-- Vaccines Page Section -->
+        <section id="vaccines" class="page-section">
+            <h2 class="text-4xl font-bold text-center mb-2 text-gray-900">
+                <i class="fas fa-hand-holding-medical text-[#00bf8b] mr-2"></i>Polio Vaccination Schedule
+            </h2>
+            <p class="text-center text-gray-600 mb-12">Track your child's polio vaccination progress. Complete all doses on time to ensure maximum protection against poliomyelitis.</p>
+            <div class="flex flex-col lg:flex-row gap-6">
+                <!-- OPV Doses Timeline -->
+                <div class="lg:w-2/3 bg-white p-6 rounded-2xl shadow-lg">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-lg font-semibold text-gray-700">OPV Doses Timeline</h3>
+                    </div>
+                   
+                    <div class="space-y-6">
+                        <!-- Dose 0 -->
+                        <div class="flex items-start" data-dose="0">
+                            <div class="relative flex-shrink-0">
+                                <div class="w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center font-bold">1</div>
+                                <div class="absolute top-0 -left-2 mt-1 -ml-1 text-sm text-red-500">
+                                    <span class="px-2 py-0.5 rounded-full bg-red-100 font-bold">Critical</span>
+                                </div>
+                            </div>
+                            <div class="ml-4 flex-grow border-b border-gray-200 pb-4">
+                                <h4 class="font-semibold text-gray-800">OPV-0</h4>
+                                <p class="text-sm text-gray-500">0-1 day</p>
+                                <p class="text-sm text-gray-600 mt-1">Birth dose - given immediately after birth</p>
+                            </div>
+                            <button class="mark-btn ml-4 text-sm text-[#00bf8b] font-semibold hover:underline" onclick="markDoseComplete(0)">Mark Complete</button>
+                        </div>
+                        <!-- Line between doses -->
+                        <div class="w-0.5 bg-gray-300 h-8 ml-4"></div>
+                       
+                        <!-- Dose 1 -->
+                        <div class="flex items-start" data-dose="1">
+                            <div class="relative flex-shrink-0">
+                                <div class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold">2</div>
+                            </div>
+                            <div class="ml-4 flex-grow border-b border-gray-200 pb-4">
+                                <h4 class="font-semibold text-gray-800">OPV-1</h4>
+                                <p class="text-sm text-gray-500">6 weeks</p>
+                                <p class="text-sm text-gray-600 mt-1">First dose at 6 weeks of age</p>
+                            </div>
+                            <button class="mark-btn ml-4 text-sm text-[#00bf8b] font-semibold hover:underline" onclick="markDoseComplete(1)">Mark Complete</button>
+                        </div>
+                        <!-- Line between doses -->
+                        <div class="w-0.5 bg-gray-300 h-8 ml-4"></div>
+
+                        <!-- Dose 2 -->
+                        <div class="flex items-start" data-dose="2">
+                            <div class="relative flex-shrink-0">
+                                <div class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold">3</div>
+                            </div>
+                            <div class="ml-4 flex-grow border-b border-gray-200 pb-4">
+                                <h4 class="font-semibold text-gray-800">OPV-2</h4>
+                                <p class="text-sm text-gray-500">10 weeks</p>
+                                <p class="text-sm text-gray-600 mt-1">Second dose at 10 weeks of age</p>
+                            </div>
+                            <button class="mark-btn ml-4 text-sm text-[#00bf8b] font-semibold hover:underline" onclick="markDoseComplete(2)">Mark Complete</button>
+                        </div>
+                        <!-- Line between doses -->
+                        <div class="w-0.5 bg-gray-300 h-8 ml-4"></div>
+                       
+                        <!-- Dose 3 -->
+                        <div class="flex items-start" data-dose="3">
+                            <div class="relative flex-shrink-0">
+                                <div class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold">4</div>
+                            </div>
+                            <div class="ml-4 flex-grow pb-4">
+                                <h4 class="font-semibold text-gray-800">OPV-3</h4>
+                                <p class="text-sm text-gray-500">14 weeks</p>
+                                <p class="text-sm text-gray-600 mt-1">Third dose at 14 weeks of age</p>
+                            </div>
+                            <button class="mark-btn ml-4 text-sm text-[#00bf8b] font-semibold hover:underline" onclick="markDoseComplete(3)">Mark Complete</button>
+                        </div>
+                    </div>
+                   
+                    <div class="mt-6 border-t pt-4">
+                        <p class="font-semibold text-gray-700">Vaccination Progress</p>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                            <div id="progress-bar" class="bg-teal-500 h-2.5 rounded-full" style="width: 0%;"></div>
+                        </div>
+                        <p id="progress-text" class="text-right text-gray-600 text-sm mt-1">0/4 doses</p>
+                    </div>
+                </div>
+               
+                <!-- Side Panel -->
+                <div class="lg:w-1/3 space-y-6">
+                    <!-- Set Reminders -->
+                    <div class="bg-white p-6 rounded-2xl shadow-lg">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-4">Set Reminders</h3>
+                        <p class="text-gray-600 text-sm mb-4">Never miss a vaccination date. Set up reminders for upcoming doses.</p>
+                        <button class="w-full bg-[#00bf8b] text-white py-2 rounded-xl font-semibold mb-2 shadow-md hover:bg-teal-600 transition duration-300" onclick="showNotification('Calendar reminder set!')">Set Calendar Reminder</button>
+                        <button class="w-full bg-gray-100 text-gray-700 py-2 rounded-xl font-semibold border border-gray-200 hover:bg-gray-200 transition duration-300" onclick="sendSmsReminder()">
+                            <i class="fas fa-sms mr-2"></i>SMS Reminder
+                        </button>
+                    </div>
+                    <!-- Important Information -->
+                    <div class="bg-white p-6 rounded-2xl shadow-lg">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-4">Important Information</h3>
+                        <ul class="text-sm text-gray-600 space-y-2">
+                            <li><i class="fas fa-check-circle text-green-500 mr-2"></i>OPV-0 should be given within 24 hours of birth</li>
+                            <li><i class="fas fa-check-circle text-green-500 mr-2"></i>Maintain a 4-week gap between subsequent doses</li>
+                            <li><i class="fas fa-check-circle text-green-500 mr-2"></i>Keep the vaccination card safe for future reference</li>
+                        </ul>
+                    </div>
+                    <!-- Next Dose Due -->
+                    <div class="bg-white p-6 rounded-2xl shadow-lg">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-4">Next Dose Due</h3>
+                        <p class="font-semibold text-gray-800">OPV-0</p>
+                        <p class="text-sm text-gray-600">Age: 0-1 day</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Appointments Page Section -->
+        <section id="appointments" class="page-section">
+            <h2 class="text-4xl font-bold text-center mb-2 text-gray-900">
+                <i class="fas fa-calendar-check text-[#00bf8b] mr-2"></i>Book Your Appointment
+            </h2>
+            <p class="text-center text-gray-600 mb-12">Schedule your visit to any health center in Odisha. Choose from vaccination, general checkup, consultation, or specialized care services.</p>
+            <div class="bg-white p-8 rounded-2xl shadow-lg max-w-4xl mx-auto">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Personal Information -->
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-700 mb-4">Personal Information</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label for="fullName" class="block text-sm font-medium text-gray-700">Full Name *</label>
+                                <input type="text" id="fullName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 p-2" placeholder="Enter your full name">
+                            </div>
+                            <div>
+                                <label for="phoneNumber" class="block text-sm font-medium text-gray-700">Phone Number *</label>
+                                <input type="tel" id="phoneNumber" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 p-2" placeholder="+91 XXXXX XXXXX">
+                            </div>
+                            <div>
+                                <label for="additionalNotes" class="block text-sm font-medium text-gray-700">Additional Notes</label>
+                                <textarea id="additionalNotes" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 p-2" placeholder="Any specific requirements or symptoms..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Appointment Details -->
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-700 mb-4">Appointment Details</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Service Type *</label>
+                                <div class="grid grid-cols-2 gap-2 mt-2">
+                                    <button class="service-type-btn flex items-center p-3 rounded-lg border border-[#00bf8b] bg-[#00bf8b] text-white transition duration-200" data-service="Vaccination">
+                                        <i class="fas fa-syringe mr-2"></i>Vaccination
+                                    </button>
+                                    <button class="service-type-btn flex items-center p-3 rounded-lg border border-gray-300 bg-gray-50 text-gray-700 hover:bg-gray-100 transition duration-200" data-service="General Checkup">
+                                        <i class="fas fa-hospital mr-2"></i>General Checkup
+                                    </button>
+                                    <button class="service-type-btn flex items-center p-3 rounded-lg border border-gray-300 bg-gray-50 text-gray-700 hover:bg-gray-100 transition duration-200" data-service="Consultation">
+                                        <i class="fas fa-user-md mr-2"></i>Consultation
+                                    </button>
+                                    <button class="service-type-btn flex items-center p-3 rounded-lg border border-gray-300 bg-gray-50 text-gray-700 hover:bg-gray-100 transition duration-200" data-service="Maternal Care">
+                                        <i class="fas fa-baby mr-2"></i>Maternal Care
+                                    </button>
+                                    <button class="service-type-btn flex items-center p-3 rounded-lg border border-gray-300 bg-gray-50 text-gray-700 hover:bg-gray-100 transition duration-200" data-service="Pediatric Care">
+                                        <i class="fas fa-child mr-2"></i>Pediatric Care
+                                    </button>
+                                    <button class="service-type-btn flex items-center p-3 rounded-lg border border-gray-300 bg-gray-50 text-gray-700 hover:bg-gray-100 transition duration-200" data-service="Dental Care">
+                                        <i class="fas fa-tooth mr-2"></i>Dental Care
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label for="appointmentDate" class="block text-sm font-medium text-gray-700">Date *</label>
+                                    <input type="date" id="appointmentDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                                </div>
+                                <div>
+                                    <label for="appointmentTime" class="block text-sm font-medium text-gray-700">Time *</label>
+                                    <input type="time" id="appointmentTime" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                                </div>
+                            </div>
+                            <div>
+                                <label for="healthCenter" class="block text-sm font-medium text-gray-700">Health Center *</label>
+                                <select id="healthCenter" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                                    <option>Select health center</option>
+                                    <option>Primary Health Center - Badamba</option>
+                                    <option>Community Health Center - Banki</option>
+                                    <option>District Hospital - Cuttack</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-8 text-center">
+                    <button class="glowing-btn w-full lg:w-auto" onclick="bookAppointment()">Book Appointment</button>
+                    <p class="mt-4 text-xs text-gray-500">You will receive a confirmation SMS with your appointment details.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Symptoms Page Section -->
+      <section id="symptoms" class="page-section">
+            <h2 class="text-4xl font-bold text-center mb-2 text-gray-900">
+                <i class="fas fa-robot text-[#00bf8b] mr-2"></i>AI Symptom Checker
+            </h2>
+            <p class="text-center text-gray-600 mb-12">Select your symptoms for AI-powered health assessment. This is for educational purposes only and should not replace professional medical advice.</p>
+            <div class="bg-white p-8 rounded-2xl shadow-lg max-w-4xl mx-auto">
+                <h3 class="text-lg font-semibold text-gray-700 mb-4">Select your symptoms:</h3>
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4" id="symptom-buttons">
+                    <button class="symptom-btn flex flex-col items-center justify-center p-6 bg-gray-100 rounded-xl shadow-md hover:bg-gray-200 transition duration-300" data-symptom="Fever">
+                        <i class="fas fa-thermometer-half text-4xl mb-2 text-gray-600"></i>
+                        <span class="font-semibold text-gray-800">Fever</span>
+                    </button>
+                    <button class="symptom-btn flex flex-col items-center justify-center p-6 bg-gray-100 rounded-xl shadow-md hover:bg-gray-200 transition duration-300" data-symptom="Cough">
+                        <i class="fas fa-head-side-cough text-4xl mb-2 text-gray-600"></i>
+                        <span class="font-semibold text-gray-800">Cough</span>
+                    </button>
+                    <button class="symptom-btn flex flex-col items-center justify-center p-6 bg-gray-100 rounded-xl shadow-md hover:bg-gray-200 transition duration-300" data-symptom="Headache">
+                        <i class="fas fa-head-side-mask text-4xl mb-2 text-gray-600"></i>
+                        <span class="font-semibold text-gray-800">Headache</span>
+                    </button>
+                    <button class="symptom-btn flex flex-col items-center justify-center p-6 bg-gray-100 rounded-xl shadow-md hover:bg-gray-200 transition duration-300" data-symptom="Body Ache">
+                        <i class="fas fa-user-injured text-4xl mb-2 text-gray-600"></i>
+                        <span class="font-semibold text-gray-800">Body Ache</span>
+                    </button>
+                    <button class="symptom-btn flex flex-col items-center justify-center p-6 bg-gray-100 rounded-xl shadow-md hover:bg-gray-200 transition duration-300" data-symptom="Vomiting">
+                        <i class="fas fa-vomit text-4xl mb-2 text-gray-600"></i>
+                        <span class="font-semibold text-gray-800">Vomiting</span>
+                    </button>
+                    <button class="symptom-btn flex flex-col items-center justify-center p-6 bg-gray-100 rounded-xl shadow-md hover:bg-gray-200 transition duration-300" data-symptom="Diarrhea">
+                        <i class="fas fa-poo-storm text-4xl mb-2 text-gray-600"></i>
+                        <span class="font-semibold text-gray-800">Diarrhea</span>
+                    </button>
+                    <button class="symptom-btn flex flex-col items-center justify-center p-6 bg-gray-100 rounded-xl shadow-md hover:bg-gray-200 transition duration-300" data-symptom="Skin Rash">
+                        <i class="fas fa-exclamation text-4xl mb-2 text-gray-600"></i>
+                        <span class="font-semibold text-gray-800">Skin Rash</span>
+                    </button>
+                    <button class="symptom-btn flex flex-col items-center justify-center p-6 bg-gray-100 rounded-xl shadow-md hover:bg-gray-200 transition duration-300" data-symptom="Fatigue">
+                        <i class="fas fa-bed text-4xl mb-2 text-gray-600"></i>
+                        <span class="font-semibold text-gray-800">Fatigue</span>
+                    </button>
+                    <button class="symptom-btn flex flex-col items-center justify-center p-6 bg-gray-100 rounded-xl shadow-md hover:bg-gray-200 transition duration-300" data-symptom="Breathing Issues">
+                        <i class="fas fa-lungs text-4xl mb-2 text-gray-600"></i>
+                        <span class="font-semibold text-gray-800">Breathing Issues</span>
+                    </button>
+                    <button class="symptom-btn flex flex-col items-center justify-center p-6 bg-gray-100 rounded-xl shadow-md hover:bg-gray-200 transition duration-300" data-symptom="Chest Pain">
+                        <i class="fas fa-heartbeat text-4xl mb-2 text-gray-600"></i>
+                        <span class="font-semibold text-gray-800">Chest Pain</span>
+                    </button>
+                    <button class="symptom-btn flex flex-col items-center justify-center p-6 bg-gray-100 rounded-xl shadow-md hover:bg-gray-200 transition duration-300" data-symptom="Dizziness">
+                        <i class="fas fa-dizzy text-4xl mb-2 text-gray-600"></i>
+                        <span class="font-semibold text-gray-800">Dizziness</span>
+                    </button>
+                    <button class="symptom-btn flex flex-col items-center justify-center p-6 bg-gray-100 rounded-xl shadow-md hover:bg-gray-200 transition duration-300" data-symptom="Nausea">
+                        <i class="fas fa-pills text-4xl mb-2 text-gray-600"></i>
+                        <span class="font-semibold text-gray-800">Nausea</span>
+                    </button>
+                </div>
+                <div class="mt-8 text-center">
+                    <button class="glowing-btn" onclick="analyzeSymptoms()">
+                        <i class="fas fa-stethoscope mr-2"></i>Analyze Symptoms
+                    </button>
+                </div>
+                <div id="symptom-results" class="hidden mt-8 p-6 bg-blue-50 border-l-4 border-blue-400 rounded-md">
+                    <h4 class="font-bold text-blue-800 mb-2">Analysis Results</h4>
+                    <p id="symptom-result-text" class="text-blue-700"></p>
+                </div>
+            </div>
+        </section>
+
+<script>
+/* Updated Symptom Analysis */
+function analyzeSymptoms() {
+    const selectedSymptoms = Array.from(document.querySelectorAll('.symptom-btn.active')).map(btn => btn.dataset.symptom);
+    const resultsDiv = document.getElementById('symptom-results');
+    const resultsText = document.getElementById('symptom-result-text');
+
+    if (selectedSymptoms.length > 0) {
+        resultsDiv.classList.remove('hidden');
+
+        const diseaseMap = {
+            "Fever": "Possible conditions: Flu, Malaria, or COVID-19. 💊 Paracetamol, hydration. ⚠️ Consult doctor if persistent.",
+            "Cough": "Possible conditions: Common Cold, Bronchitis, or Asthma. 💊 Cough syrup, inhaler if prescribed. ⚠️ Doctor if severe.",
+            "Headache": "Possible conditions: Migraine, Stress headache, or Dehydration. 💊 Painkillers, hydration. ⚠️ Rest in dark room.",
+            "Body Ache": "Possible conditions: Viral Fever, Flu, or Muscle strain. 💊 Paracetamol/Ibuprofen. ⚠️ Rest well.",
+            "Vomiting": "Possible conditions: Food Poisoning, Gastric Infection. 💊 ORS, antiemetics. ⚠️ Stay hydrated.",
+            "Diarrhea": "Possible conditions: Gastroenteritis, Food Poisoning. 💊 ORS, zinc tablets. ⚠️ Consult doctor if severe.",
+            "Skin Rash": "Possible conditions: Allergy, Chickenpox, Fungal infection. 💊 Antihistamines, antifungal cream. ⚠️ Dermatologist if spreading.",
+            "Fatigue": "Possible conditions: Anemia, Thyroid disorder, Viral infection. 💊 Iron or vitamin supplements. ⚠️ Checkup advised.",
+            "Breathing Issues": "Possible conditions: Asthma, Pneumonia, COVID-19. 💊 Inhaler, steam inhalation. ⚠️ Doctor immediately if severe.",
+            "Chest Pain": "Possible conditions: Heart attack, Angina, Pneumonia. 💊 Aspirin in emergency. ⚠️ Call ambulance urgently.",
+            "Dizziness": "Possible conditions: Low BP, Anemia, Dehydration. 💊 ORS, iron supplements. ⚠️ Rest & hydrate.",
+            "Nausea": "Possible conditions: Gastritis, Food poisoning, Early pregnancy. 💊 Antiemetics, ORS. ⚠️ Avoid oily/spicy food."
+        };
+
+        let output = "";
+        selectedSymptoms.forEach(sym => {
+            if (diseaseMap[sym]) {
+                output += `<p><strong>${sym}</strong>: ${diseaseMap[sym]}</p>`;
+            }
+        });
+
+        resultsText.innerHTML = output;
+        showNotification("Symptom analysis complete!");
+    } else {
+        resultsDiv.classList.add('hidden');
+        showNotification("Please select at least one symptom to analyze.");
+    }
+}
+</script>
+
+       
+        <!-- AI Analysis Page Section -->
+        <section id="ai-analysis" class="page-section">
+            <h2 class="text-4xl font-bold text-center mb-2 text-gray-900">
+                <i class="fas fa-brain text-[#00bf8b] mr-2"></i>AI Medical Image Analysis
+            </h2>
+            <p class="text-center text-gray-600 mb-12">Upload medical images for AI-powered preliminary analysis. This tool provides educational insights and should not replace professional medical diagnosis.</p>
+            <div class="bg-white p-8 rounded-2xl shadow-lg max-w-4xl mx-auto">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Upload Medical Image -->
+                    <div class="text-center">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-4">Upload Medical Image</h3>
+                        <div class="border-2 border-dashed border-gray-300 rounded-xl p-8 flex flex-col items-center justify-center">
+                            <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
+                            <p class="text-sm text-gray-600">Click to select or drag and drop an image.</p>
+                            <p class="text-xs text-gray-500 mt-1">Supported: JPG, PNG, WebP (Max 5MB)</p>
+                        </div>
+                        <div class="mt-4 flex justify-center space-x-4">
+                            <input type="file" id="image-upload" class="hidden" accept="image/*" onchange="handleImageUpload()">
+                            <button class="bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-xl font-semibold hover:bg-gray-100 transition duration-200" onclick="document.getElementById('image-upload').click()"><i class="fas fa-folder-open mr-2"></i>Choose File</button>
+                            <button class="bg-[#00bf8b] text-white py-2 px-4 rounded-xl font-semibold hover:bg-teal-600 transition duration-200" onclick="handleTakePhoto()"><i class="fas fa-camera mr-2"></i>Take Photo</button>
+                        </div>
+                    </div>
+                    <!-- Analysis Results -->
+                    <div class="text-center">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-4">Analysis Results</h3>
+                        <div class="border-2 border-dashed border-gray-300 rounded-xl p-8 flex flex-col items-center justify-center h-full">
+                            <p id="analysis-results-text" class="text-sm text-gray-600">Upload an image and click analyze to see AI-powered insights</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-8">
+                    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-md shadow-sm">
+                        <h4 class="font-bold text-yellow-800">Important Medical Disclaimer</h4>
+                        <ul class="text-yellow-700 text-sm list-disc list-inside mt-2 space-y-1">
+                            <li>This AI analysis is for educational and screening purposes only</li>
+                            <li>Results should not replace professional medical diagnosis</li>
+                            <li>Always consult qualified healthcare providers for medical advice</li>
+                            <li>Images are processed locally and not stored on our servers</li>
+                            <li>For urgent medical conditions, seek immediate medical attention</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+       
+        <!-- Services Page Section -->
+        <section id="services" class="page-section">
+            <h2 class="text-4xl font-bold text-center mb-2 text-gray-900">
+                <i class="fas fa-map-marker-alt text-[#00bf8b] mr-2"></i>Nearby Health Centers
+            </h2>
+            <p class="text-center text-gray-600 mb-12">Find health centers, hospitals, and medical facilities near your location. Get directions, contact information, and service details.</p>
+            <div class="mb-8 flex justify-center flex-wrap gap-2">
+                <button class="bg-white border border-gray-300 text-gray-700 px-6 py-2 rounded-full font-semibold hover:bg-gray-100 transition duration-200 active:bg-gray-200 active:ring-2 active:ring-gray-300">All Centers</button>
+                <button class="bg-white border border-gray-300 text-gray-700 px-6 py-2 rounded-full font-semibold hover:bg-gray-100 transition duration-200">Primary Health</button>
+                <button class="bg-white border border-gray-300 text-gray-700 px-6 py-2 rounded-full font-semibold hover:bg-gray-100 transition duration-200">Community Health</button>
+                <button class="bg-white border border-gray-300 text-gray-700 px-6 py-2 rounded-full font-semibold hover:bg-gray-100 transition duration-200">Emergency</button>
+                <button class="bg-white border border-gray-300 text-gray-700 px-6 py-2 rounded-full font-semibold hover:bg-gray-100 transition duration-200">Specialist Care</button>
+            </div>
+            <div class="mb-8 text-center">
+                <button class="bg-white border border-gray-300 text-gray-700 px-6 py-2 rounded-full font-semibold hover:bg-gray-100 transition duration-200" onclick="detectLocation()"><i class="fas fa-location-crosshairs mr-2"></i>Detect My Location</button>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Center Card 1 -->
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="font-bold text-lg text-gray-800">Primary Health Center - Badamba</h4>
+                        <span class="text-sm text-yellow-500"><i class="fas fa-star mr-1"></i>4.2</span>
+                    </div>
+                    <p class="text-sm text-gray-500 mb-2"><i class="fas fa-map-marker-alt mr-2"></i>3.3 km | Badamba, Cuttack District</p>
+                    <p class="font-semibold text-gray-700 mb-1">Available Services:</p>
+                    <div class="flex flex-wrap gap-2 text-xs">
+                        <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full">Vaccination</span>
+                        <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full">General OPD</span>
+                        <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">Maternal Care</span>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-4">
+                        <i class="fas fa-clock mr-2"></i>9:00 AM - 5:00 PM
+                    </p>
+                    <div class="mt-6 flex space-x-4">
+                        <button class="w-1/2 glowing-btn" onclick="getDirections('Primary Health Center - Badamba')"><i class="fas fa-directions mr-2"></i>Directions</button>
+                        <button class="w-1/2 bg-white text-gray-700 py-2 rounded-xl border border-gray-300 font-semibold hover:bg-gray-100 transition duration-200" onclick="makeCall('108')"><i class="fas fa-phone-alt mr-2"></i>Call</button>
+                    </div>
+                </div>
+                <!-- Center Card 2 -->
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="font-bold text-lg text-gray-800">Community Health Center - Banki</h4>
+                        <span class="text-sm text-yellow-500"><i class="fas fa-star mr-1"></i>4.5</span>
+                    </div>
+                    <p class="text-sm text-gray-500 mb-2"><i class="fas fa-map-marker-alt mr-2"></i>9.7 km | Banki, Cuttack District</p>
+                    <p class="font-semibold text-gray-700 mb-1">Available Services:</p>
+                    <div class="flex flex-wrap gap-2 text-xs">
+                        <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full">Surgery</span>
+                        <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full">Emergency</span>
+                        <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">Specialist Care</span>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-4">
+                        <i class="fas fa-clock mr-2"></i>24/7
+                    </p>
+                    <div class="mt-6 flex space-x-4">
+                        <button class="w-1/2 glowing-btn" onclick="getDirections('Community Health Center - Banki')"><i class="fas fa-directions mr-2"></i>Directions</button>
+                        <button class="w-1/2 bg-white text-gray-700 py-2 rounded-xl border border-gray-300 font-semibold hover:bg-gray-100 transition duration-200" onclick="makeCall('108')"><i class="fas fa-phone-alt mr-2"></i>Call</button>
+                    </div>
+                </div>
+                <!-- Center Card 3 -->
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="font-bold text-lg text-gray-800">District Hospital - Cuttack</h4>
+                        <span class="text-sm text-yellow-500"><i class="fas fa-star mr-1"></i>4.3</span>
+                    </div>
+                    <p class="text-sm text-gray-500 mb-2"><i class="fas fa-map-marker-alt mr-2"></i>12.1 km | Cuttack City, Odisha</p>
+                    <p class="font-semibold text-gray-700 mb-1">Available Services:</p>
+                    <div class="flex flex-wrap gap-2 text-xs">
+                        <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full">All Specialties</span>
+                        <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full">Emergency</span>
+                        <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">24/7</span>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-4">
+                        <i class="fas fa-clock mr-2"></i>24/7
+                    </p>
+                    <div class="mt-6 flex space-x-4">
+                        <button class="w-1/2 glowing-btn" onclick="getDirections('District Hospital - Cuttack')"><i class="fas fa-directions mr-2"></i>Directions</button>
+                        <button class="w-1/2 bg-white text-gray-700 py-2 rounded-xl border border-gray-300 font-semibold hover:bg-gray-100 transition duration-200" onclick="makeCall('108')"><i class="fas fa-phone-alt mr-2"></i>Call</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dashboard Page Section -->
+        <section id="dashboard" class="page-section">
+            <!-- Emergency Contacts -->
+            <div class="bg-white p-8 rounded-2xl shadow-lg max-w-4xl mx-auto mb-8">
+                <h3 class="text-lg font-semibold text-gray-700 mb-4">Emergency Contacts</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
+                    <div class="p-4 rounded-xl bg-red-50 hover:bg-red-100 transition duration-200" onclick="makeCall('108')">
+                        <i class="fas fa-ambulance text-4xl text-red-500 mb-2"></i>
+                        <p class="font-semibold text-gray-800">Ambulance</p>
+                        <p class="text-xl font-bold text-red-500">108</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-blue-50 hover:bg-blue-100 transition duration-200" onclick="makeCall('102')">
+                        <i class="fas fa-hands-helping text-4xl text-blue-500 mb-2"></i>
+                        <p class="font-semibold text-gray-800">Medical Helpline</p>
+                        <p class="text-xl font-bold text-blue-500">102</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-gray-100 hover:bg-gray-200 transition duration-200" onclick="makeCall('100')">
+                        <i class="fas fa-shield-alt text-4xl text-gray-600 mb-2"></i>
+                        <p class="font-semibold text-gray-800">Police</p>
+                        <p class="text-xl font-bold text-gray-600">100</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Content -->
+            <div class="flex flex-col items-center mb-8">
+                <h2 class="text-4xl font-bold mb-2 text-gray-900">
+                    <i class="fas fa-chart-line text-[#00bf8b] mr-2"></i>Vaccination Coverage Dashboard
+                </h2>
+                <p class="text-center text-gray-600">Real-time vaccination coverage statistics across Odisha. Monitor progress, track campaigns, and ensure comprehensive immunization coverage.</p>
+            </div>
+           
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center text-center">
+                    <i class="fas fa-users text-4xl text-blue-500 mb-2"></i>
+                    <span class="text-2xl font-bold text-gray-900">50.2M</span>
+                    <p class="text-sm text-gray-600">Total Population</p>
+                </div>
+                <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center text-center">
+                    <i class="fas fa-chart-pie text-4xl text-green-500 mb-2"></i>
+                    <span class="text-2xl font-bold text-gray-900">92.3%</span>
+                    <p class="text-sm text-gray-600">Overall Coverage</p>
+                </div>
+                <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center text-center">
+                    <i class="fas fa-bullhorn text-4xl text-yellow-500 mb-2"></i>
+                    <span class="text-2xl font-bold text-gray-900">3</span>
+                    <p class="text-sm text-gray-600">Active Campaigns</p>
+                </div>
+                <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center text-center">
+                    <i class="fas fa-arrow-up text-4xl text-teal-500 mb-2"></i>
+                    <span class="text-2xl font-bold text-gray-900">+2.8%</span>
+                    <p class="text-sm text-gray-600">Monthly Growth</p>
+                </div>
+            </div>
+           
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <!-- Vaccination Coverage by Type -->
+                <div class="bg-white p-6 rounded-2xl shadow-lg">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-4">Vaccination Coverage by Type</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center">
+                            <span class="w-24 text-sm text-gray-600">Polio</span>
+                            <div class="flex-grow bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-teal-500 h-2.5 rounded-full" style="width: 95%;"></div>
+                            </div>
+                            <span class="ml-4 text-sm font-semibold text-gray-800">95%</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="w-24 text-sm text-gray-600">Measles</span>
+                            <div class="flex-grow bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-red-500 h-2.5 rounded-full" style="width: 90%;"></div>
+                            </div>
+                            <span class="ml-4 text-sm font-semibold text-gray-800">90%</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="w-24 text-sm text-gray-600">DPT</span>
+                            <div class="flex-grow bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-yellow-500 h-2.5 rounded-full" style="width: 85%;"></div>
+                            </div>
+                            <span class="ml-4 text-sm font-semibold text-gray-800">85%</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="w-24 text-sm text-gray-600">Hepatitis B</span>
+                            <div class="flex-grow bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-orange-500 h-2.5 rounded-full" style="width: 80%;"></div>
+                            </div>
+                            <span class="ml-4 text-sm font-semibold text-gray-800">80%</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- District-wise Coverage -->
+                <div class="bg-white p-6 rounded-2xl shadow-lg">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-4">District-wise Coverage</h3>
+                    <div class="grid grid-cols-2 gap-y-4 text-sm">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Cuttack</span>
+                            <span class="font-semibold text-gray-800">95%</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Bhubaneswar</span>
+                            <span class="font-semibold text-gray-800">97%</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Berhampur</span>
+                            <span class="font-semibold text-gray-800">89%</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Sambalpur</span>
+                            <span class="font-semibold text-gray-800">91%</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Rourkela</span>
+                            <span class="font-semibold text-gray-800">93%</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Puri</span>
+                            <span class="font-semibold text-gray-800">88%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+           
+            <!-- Current Vaccination Campaigns -->
+            <div class="bg-white p-6 rounded-2xl shadow-lg mb-8">
+                <h3 class="text-lg font-semibold text-gray-700 mb-4">Current Vaccination Campaigns</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="p-4 bg-green-50 rounded-lg border-l-4 border-green-500">
+                        <span class="font-semibold text-sm text-green-700">completed</span>
+                        <h4 class="font-bold text-gray-800 mt-1">Polio National Immunization Day</h4>
+                        <p class="text-xs text-gray-500 mt-2">Date: January 28, 2024</p>
+                        <p class="text-xs text-gray-500">Target: 2.1M children</p>
+                        <p class="text-xs text-gray-500">Coverage: <span class="font-bold text-green-700">99.2%</span></p>
+                    </div>
+                    <div class="p-4 bg-yellow-50 rounded-lg border-l-4 border-yellow-500">
+                        <span class="font-semibold text-sm text-yellow-700">ongoing</span>
+                        <h4 class="font-bold text-gray-800 mt-1">Measles-Rubella Campaign</h4>
+                        <p class="text-xs text-gray-500 mt-2">Date: March 15, 2024</p>
+                        <p class="text-xs text-gray-500">Target: 1.8M children</p>
+                        <p class="text-xs text-gray-500">Coverage: <span class="font-bold text-yellow-700">67.8%</span></p>
+                    </div>
+                    <div class="p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+                        <span class="font-semibold text-sm text-blue-700">upcoming</span>
+                        <h4 class="font-bold text-gray-800 mt-1">World Immunization Week</h4>
+                        <p class="text-xs text-gray-500 mt-2">Date: April 24-30, 2024</p>
+                        <p class="text-xs text-gray-500">Target: 2.5M children</p>
+                        <p class="text-xs text-gray-500">Coverage: <span class="font-bold text-blue-700">0%</span></p>
+                    </div>
+                </div>
+            </div>
+           
+            <!-- Key Achievements -->
+            <div class="bg-white p-6 rounded-2xl shadow-lg">
+                <h3 class="text-lg font-semibold text-gray-700 mb-4">Key Achievements</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
+                    <div class="p-4 rounded-xl">
+                        <i class="fas fa-trophy text-4xl text-yellow-500 mb-2"></i>
+                        <p class="font-semibold text-gray-800">Polio-Free Status</p>
+                        <p class="text-sm text-gray-600">Maintained for 10+ years</p>
+                    </div>
+                    <div class="p-4 rounded-xl">
+                        <i class="fas fa-award text-4xl text-blue-500 mb-2"></i>
+                        <p class="font-semibold text-gray-800">WHO Recognition</p>
+                        <p class="text-sm text-gray-600">Excellence in Immunization</p>
+                    </div>
+                    <div class="p-4 rounded-xl">
+                        <i class="fas fa-globe text-4xl text-teal-500 mb-2"></i>
+                        <p class="font-semibold text-gray-800">Digital Tracking</p>
+                        <p class="text-sm text-gray-600">100% centers connected</p>
+                    </div>
+                </div>
+            </div>
+            <p class="text-center text-xs text-gray-400 mt-8">Data sources: Ministry of Health & Family Welfare, Government of Odisha | Last updated: 9/14/2025</p>
+        </section>
+
+    </main>
+   
+    <!-- Notification Box -->
+    <div id="notification-box" class="notification-box">
+        <span id="notification-message"></span>
     </div>
 
+    <!-- Footer -->
+    <footer class="bg-[#00bf8b] text-white py-12 mt-12">
+        <div class="container mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+                <h3 class="font-bold text-lg mb-4">Odisha Health Assistant</h3>
+                <p class="text-sm">Your trusted partner for preventive healthcare and wellness in Odisha.</p>
+            </div>
+            <div>
+                <h4 class="font-bold text-sm mb-4">Quick Links</h4>
+                <ul class="text-sm space-y-2">
+                    <li><a href="#" onclick="showPage('vaccines')" class="hover:underline">Vaccination</a></li>
+                    <li><a href="#" onclick="showPage('symptoms')" class="hover:underline">Symptom Checker</a></li>
+                    <li><a href="#" onclick="showPage('appointments')" class="hover:underline">Book Appointment</a></li>
+                    <li><a href="#" onclick="showPage('services')" class="hover:underline">Health Centers</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold text-sm mb-4">Emergency</h4>
+                <ul class="text-sm space-y-2">
+                    <li><a href="#" onclick="makeCall('108')" class="hover:underline">108 - Ambulance</a></li>
+                    <li><a href="#" onclick="makeCall('102')" class="hover:underline">102 - Medical Helpline</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold text-sm mb-4">Contact</h4>
+                <p class="text-sm">Government of Odisha<br>Electronics & IT Department<br>MedTech / HealthTech Initiative</p>
+            </div>
+        </div>
+        <div class="container mx-auto px-4 mt-8 text-center text-sm">
+            <p>© 2024 Government of Odisha. All rights reserved. Healthcare data is processed securely.</p>
+        </div>
+    </footer>
+
+    <!-- Floating Chat Bubble -->
+    <div class="chat-bubble" onclick="openWhatsAppChat()">
+        <i class="fab fa-whatsapp text-2xl"></i>
+    </div>
+   
     <script>
-        const chatContainer = document.getElementById('chatContainer');
-        const userInput = document.getElementById('userInput');
-        
-        const healthKnowledge = {
-            'fever': 'For fever, rest and stay hydrated. Take paracetamol if needed. If fever persists beyond 3 days or exceeds 103°F, consult a doctor immediately.',
-            'cold': 'For common cold, get plenty of rest, drink warm fluids, and use steam inhalation. It usually resolves in 7-10 days. Consult a doctor if symptoms worsen.',
-            'cough': 'For cough, stay hydrated, use honey (for adults), and avoid cold drinks. If it persists beyond 2 weeks or has blood, see a doctor.',
-            'headache': 'For headaches, rest in a quiet dark room, stay hydrated, and try cold compress. Take pain relievers if needed. Persistent severe headaches need medical attention.',
-            'stomach pain': 'For stomach pain, avoid spicy foods, stay hydrated, and rest. If severe or persistent, or with fever/vomiting, consult a doctor immediately.',
-            'vaccination': 'Odisha follows the National Immunization Schedule. Key vaccines: BCG, Hepatitis B, DPT, Polio, MMR, and others. Contact your nearest Primary Health Center for vaccination services.',
-            'hospital': 'Major hospitals in Odisha: AIIMS Bhubaneswar, SCB Medical College Cuttack, MKCG Medical College Berhampur, and District Headquarters Hospitals across all districts.',
-            'appointment': 'To book appointments: 1) Visit hospital website/app 2) Call hospital helpline 3) Use Odisha eHealth portal 4) Visit hospital OPD desk. Most hospitals now offer online booking.',
-            'covid': 'For COVID-19 symptoms (fever, cough, breathing difficulty), isolate immediately and get tested. Contact state helpline: 104 or 1075. Vaccination is available at all government centers.',
-            'pregnancy': 'For pregnancy care, register at nearest Anganwadi center. Free services include checkups, iron tablets, and delivery care under PMSMA scheme. Regular checkups are essential.',
-            'child health': 'Child health services include immunization, growth monitoring, and nutrition supplements through Anganwadi centers. ICDS provides comprehensive child development services.',
-            'emergency': '🚨 For medical emergencies, call 108 (Ambulance) or 102 (Matrushree Ambulance). These services are free 24/7 across Odisha.'
-        };
-        
-        function quickMessage(message) {
-            userInput.value = message;
-            sendMessage();
-        }
-        
-        function handleKeyPress(event) {
-            if (event.key === 'Enter') {
-                sendMessage();
-            }
-        }
-        
-        function sendMessage() {
-            const message = userInput.value.trim();
-            if (message === '') return;
-            
-            addMessage(message, 'user');
-            userInput.value = '';
-            
-            setTimeout(() => {
-                const response = generateResponse(message.toLowerCase());
-                addMessage(response, 'bot');
-            }, 1000);
-        }
-        
-        function addMessage(text, sender) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${sender}`;
-            
-            const contentDiv = document.createElement('div');
-            contentDiv.className = 'message-content';
-            contentDiv.innerHTML = text;
-            
-            messageDiv.appendChild(contentDiv);
-            chatContainer.appendChild(messageDiv);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-        }
-        
-        function generateResponse(message) {
-            for (let keyword in healthKnowledge) {
-                if (message.includes(keyword)) {
-                    return healthKnowledge[keyword];
+        // State to track completed doses
+        const doses = [
+            { id: 0, completed: false, name: "OPV-0" },
+            { id: 1, completed: false, name: "OPV-1" },
+            { id: 2, completed: false, name: "OPV-2" },
+            { id: 3, completed: false, name: "OPV-3" }
+        ];
+
+        // JavaScript to handle single-page navigation
+        function showPage(pageId) {
+            // Get all page sections and nav links
+            const pages = document.querySelectorAll('.page-section');
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            // Hide all pages
+            pages.forEach(page => page.classList.remove('active-page'));
+           
+            // Deactivate all nav links
+            navLinks.forEach(link => link.classList.remove('active'));
+
+            // Show the selected page and activate the corresponding nav link
+            const activePage = document.getElementById(pageId);
+            if (activePage) {
+                activePage.classList.add('active-page');
+                const activeNavLink = document.querySelector(`a[href="#${pageId}"]`);
+                if (activeNavLink) {
+                    activeNavLink.classList.add('active');
                 }
             }
-            
-            if (message.includes('hello') || message.includes('hi')) {
-                return 'Hello! I\'m here to help with your health queries. You can ask about symptoms, vaccinations, hospitals, or appointments.';
-            }
-            
-            if (message.includes('thank')) {
-                return 'You\'re welcome! Stay healthy and feel free to ask if you have more questions. 😊';
-            }
-            
-            if (message.includes('doctor') || message.includes('specialist')) {
-                return 'You can find specialists at major hospitals like AIIMS Bhubaneswar, SCB Medical College, and district hospitals. What specialty are you looking for?';
-            }
-            
-            if (message.includes('medicine') || message.includes('pharmacy')) {
-                return 'Always consult a doctor before taking medicines. For common ailments, visit licensed pharmacies. Many hospitals have 24/7 pharmacies.';
-            }
-            
-            return 'I understand your concern. For specific medical advice, I recommend consulting with a healthcare professional. You can visit your nearest Primary Health Center or call 104 for health information. Is there anything specific I can help you with?';
         }
+       
+        // Function to update the vaccination progress bar
+        function updateProgress() {
+            const completedDoses = doses.filter(d => d.completed).length;
+            const totalDoses = doses.length;
+            const progress = (completedDoses / totalDoses) * 100;
+
+            const progressBar = document.getElementById('progress-bar');
+            const progressText = document.getElementById('progress-text');
+
+            if (progressBar && progressText) {
+                progressBar.style.width = `${progress}%`;
+                progressText.innerText = `${completedDoses}/${totalDoses} doses`;
+            }
+
+            // Update button states
+            doses.forEach((dose, index) => {
+                const markBtn = document.querySelector(`[data-dose="${index}"] .mark-btn`);
+                if (dose.completed) {
+                    if (markBtn) {
+                        markBtn.disabled = true;
+                        markBtn.innerText = "Complete";
+                        markBtn.classList.remove('text-[#00bf8b]');
+                        markBtn.classList.add('text-gray-400');
+                    }
+                }
+            });
+        }
+
+        // Function to mark a dose as complete
+        function markDoseComplete(doseId) {
+            const dose = doses.find(d => d.id === doseId);
+            if (dose) {
+                dose.completed = true;
+                showNotification(`${dose.name} marked as complete!`);
+                updateProgress();
+            }
+        }
+
+        // Function to show a temporary notification box
+        function showNotification(message) {
+            const box = document.getElementById('notification-box');
+            const msg = document.getElementById('notification-message');
+            if (box && msg) {
+                msg.innerText = message;
+                box.classList.add('show');
+                setTimeout(() => {
+                    box.classList.remove('show');
+                }, 3000);
+            }
+        }
+
+        // Handle appointment form submission
+        function bookAppointment() {
+            const fullName = document.getElementById('fullName').value;
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            const appointmentDate = document.getElementById('appointmentDate').value;
+            const appointmentTime = document.getElementById('appointmentTime').value;
+            const healthCenter = document.getElementById('healthCenter').value;
+            const selectedService = document.querySelector('.service-type-btn.active');
+
+            // Basic validation
+            if (!fullName || !phoneNumber || !appointmentDate || !appointmentTime || healthCenter === "Select health center" || !selectedService) {
+                showNotification("Please fill out all required fields.");
+                return;
+            }
+
+            // Simulate booking and show success message
+            const service = selectedService.dataset.service;
+            const message = `Appointment for ${service} on ${appointmentDate} at ${appointmentTime} has been booked.`;
+            showNotification(message);
+        }
+
+        // Toggle symptom button active state
+        document.querySelectorAll('.symptom-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                button.classList.toggle('active');
+            });
+        });
+
+        // Handle symptom analysis
+        function analyzeSymptoms() {
+            const selectedSymptoms = Array.from(document.querySelectorAll('.symptom-btn.active')).map(btn => btn.dataset.symptom);
+            const resultsDiv = document.getElementById('symptom-results');
+            const resultsText = document.getElementById('symptom-result-text');
+
+            if (selectedSymptoms.length > 0) {
+                resultsDiv.classList.remove('hidden');
+                resultsText.innerHTML = `Based on your selected symptoms (${selectedSymptoms.join(', ')}), our AI suggests consulting a general physician for a detailed checkup. This could be related to a common cold or flu. For a professional diagnosis, please book an appointment.`;
+                showNotification("Symptom analysis complete!");
+            } else {
+                showNotification("Please select at least one symptom to analyze.");
+            }
+        }
+
+        // Handle image upload simulation
+        function handleImageUpload() {
+            const analysisText = document.getElementById('analysis-results-text');
+            analysisText.innerText = "Analyzing image...";
+            setTimeout(() => {
+                analysisText.innerText = "AI analysis complete. The image shows a rash on the skin. This could be due to an allergic reaction. Please consult a dermatologist for a professional opinion.";
+                showNotification("Image analysis complete!");
+            }, 2000);
+        }
+
+        function handleTakePhoto() {
+            showNotification("Taking a photo is not supported in this demo. Please use the 'Choose File' option.");
+        }
+
+        // Handle service type button selection
+        document.querySelectorAll('.service-type-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.service-type-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    btn.classList.remove('bg-[#00bf8b]', 'text-white');
+                    btn.classList.add('bg-gray-50', 'text-gray-700');
+                    btn.classList.remove('border-[#00bf8b]');
+                    btn.classList.add('border-gray-300');
+                });
+                button.classList.add('active');
+                button.classList.add('bg-[#00bf8b]', 'text-white');
+                button.classList.remove('bg-gray-50', 'text-gray-700');
+                button.classList.add('border-[#00bf8b]');
+                button.classList.remove('border-gray-300');
+            });
+        });
+
+        // Function to simulate location detection
+        function detectLocation() {
+            showNotification("Simulating location detection. Showing nearby health centers based on a default location.");
+        }
+       
+        // Function to simulate a call action
+        function makeCall(number) {
+            showNotification(`Simulating a call to ${number}.`);
+            // In a real app, this would use a tel: link or native API
+            // window.location.href = `tel:${number}`;
+        }
+       
+        // Function to simulate getting directions
+        function getDirections(destination) {
+            showNotification(`Simulating directions to ${destination}.`);
+            // In a real app, this would open a map app
+            // window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}`, '_blank');
+        }
+
+        // Function to show health tips
+        function showTip(tipId) {
+            const tips = {
+                'dengue': {
+                    title: 'Dengue Prevention',
+                    content: 'To prevent dengue, eliminate all standing water sources around your home. Use mosquito repellent, wear long sleeves, and ensure screens on windows and doors are intact.'
+                },
+                'diarrhea': {
+                    title: 'Diarrhea Care',
+                    content: 'To prevent diarrhea, ensure safe drinking water by boiling or using a filter. Practice proper hand hygiene, especially before eating and after using the restroom. Wash fruits and vegetables thoroughly.'
+                },
+                'covid': {
+                    title: 'COVID Protection',
+                    content: 'To prevent COVID, get vaccinated and wear a mask in crowded indoor spaces. Maintain physical distance, wash your hands frequently, and avoid touching your face.'
+                },
+                'maternal': {
+                    title: 'Maternal Care',
+                    content: 'For maternal care, attend all scheduled prenatal checkups. Maintain a healthy diet with essential nutrients, stay hydrated, and follow your doctor\'s advice for rest and activity.'
+                },
+                'vaccination': {
+                    title: 'Vaccination',
+                    content: 'Vaccinations are crucial for preventing infectious diseases. Keep track of your and your family\'s vaccination schedules and ensure all doses are completed on time to build immunity.'
+                },
+                'malaria': {
+                    title: 'Malaria Prevention',
+                    content: 'To prevent malaria, use mosquito nets while sleeping. Apply mosquito repellent, wear protective clothing, and seek medical advice immediately if you experience fever, chills, or headache.'
+                },
+                'personal_hygiene': {
+                    title: 'Personal Hygiene',
+                    content: 'Maintaining personal hygiene is key to preventing many illnesses. Wash your hands regularly with soap and water, especially before meals. Keep your living spaces clean and tidy to avoid the spread of germs.'
+                }
+            };
+           
+            const tipDisplay = document.getElementById('tip-display');
+            const tipTitle = document.getElementById('tip-title');
+            const tipContent = document.getElementById('tip-content');
+           
+            if (tips[tipId]) {
+                tipTitle.innerText = tips[tipId].title;
+                tipContent.innerText = tips[tipId].content;
+                tipDisplay.classList.remove('hidden');
+                tipDisplay.classList.add('opacity-100');
+            } else {
+                tipDisplay.classList.add('hidden');
+                tipDisplay.classList.remove('opacity-100');
+            }
+        }
+
+        // Function to simulate sending SMS reminder
+        function sendSmsReminder() {
+            // A real implementation would require a backend API to send an SMS.
+            // This is a front-end simulation.
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            if (phoneNumber) {
+                showNotification(`SMS reminder sent to ${phoneNumber}!`);
+            } else {
+                showNotification('Please enter a phone number to send a reminder.');
+            }
+        }
+
+        // Function to open WhatsApp chat
+        function openWhatsAppChat() {
+            const whatsappNumber = "7569094704";
+            const message = "Hello Odisha Health Assistant, I have a question about my health.";
+            const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        // Initial page load, set the home page as active
+        document.addEventListener('DOMContentLoaded', () => {
+            showPage('home');
+            updateProgress();
+        });
     </script>
+
+</body>
+</html>
+
+On Sun, Sep 14, 2025 at 2:35 AM Devulapally Aakarsh <aakarshkashyap42@gmail.com> wrote:
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Odisha Health Assistant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .page-section {
+            display: none;
+        }
+
+        .active-page {
+            display: block;
+        }
+       
+        .nav-link.active {
+            color: #00bf8b;
+            font-weight: 600;
+        }
+
+        /* Custom styles for glowing button */
+        .glowing-btn {
+            position: relative;
+            background-color: #00bf8b;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .glowing-btn:hover {
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .glowing-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 191, 139, 0.5);
+            border-radius: 9999px;
+            transform: translate(-50%, -50%);
+            animation: pulse 2s infinite cubic-bezier(0.66, 0, 0, 1);
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+       
+        .glowing-btn:hover::before {
+            opacity: 1;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.7;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1.5);
+                opacity: 0;
+            }
+        }
+       
+        /* Custom styles for floating chat bubble */
+        .chat-bubble {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background-color: #00bf8b;
+            color: white;
+            border-radius: 9999px;
+            padding: 1rem;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease-in-out;
+            cursor: pointer;
+            z-index: 50;
+        }
+
+        .chat-bubble:hover {
+            transform: scale(1.1);
+        }
+
+        .symptom-btn.active {
+            background-color: #00bf8b;
+            color: white;
+        }
+
+        .service-type-btn.active {
+            background-color: #00bf8b;
+            color: white;
+            border-color: #00bf8b;
+        }
+
+        .notification-box {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #00bf8b;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .notification-box.show {
+            display: block;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-[#00bf8b]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span class="font-bold text-lg text-gray-700">Odisha Health Assistant</span>
+            </div>
+            <div class="flex items-center space-x-6 hidden lg:flex">
+                <a href="#home" onclick="showPage('home')" class="nav-link text-gray-600 hover:text-[#00bf8b] transition duration-200">Home</a>
+                <a href="#prevention" onclick="showPage('prevention')" class="nav-link text-gray-600 hover:text-[#00bf8b] transition duration-200">Prevention</a>
+                <a href="#vaccines" onclick="showPage('vaccines')" class="nav-link text-gray-600 hover:text-[#00bf8b] transition duration-200">Vaccines</a>
+                <a href="#appointments" onclick="showPage('appointments')" class="nav-link text-gray-600 hover:text-[#00bf8b] transition duration-200">Appointments</a>
+                <a href="#symptoms" onclick="showPage('symptoms')" class="nav-link text-gray-600 hover:text-[#00bf8b] transition duration-200">Symptoms</a>
+                <a href="#ai-analysis" onclick="showPage('ai-analysis')" class="nav-link text-gray-600 hover:text-[#00bf8b] transition duration-200">AI Analysis</a>
+                <a href="#services" onclick="showPage('services')" class="nav-link text-gray-600 hover:text-[#00bf8b] transition duration-200">Services</a>
+                <a href="#dashboard" onclick="showPage('dashboard')" class="nav-link text-gray-600 hover:text-[#00bf8b] transition duration-200">Dashboard</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-1 text-red-500 font-bold">
+                    <i class="fas fa-phone-alt"></i>
+                    <span>108</span>
+                </div>
+                <select class="rounded-md border border-gray-300 p-2 text-sm bg-gray-50">
+                    <option>English</option>
+                    <option>Odia</option>
+                    <option>Hindi</option>
+                </select>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+
+        <!-- Health Alert Banner (visible on all pages) -->
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-md shadow-sm flex justify-between items-center mb-6">
+            <div class="flex items-center">
+                <i class="fas fa-exclamation-triangle text-yellow-500 mr-3"></i>
+                <div>
+                    <p class="font-bold text-yellow-800">Health Alert - Dengue Cases Rising</p>
+                    <p class="text-yellow-700 text-sm mt-1">Increased dengue cases reported in Cuttack and Bhubaneswar. Remove standing water from containers, use mosquito repellents, and seek immediate medical attention for high fever. <a href="#" class="text-yellow-900 font-semibold underline">Learn More</a></p>
+                </div>
+            </div>
+            <button class="text-yellow-700 hover:text-yellow-900 transition duration-200">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <!-- Home Page Section -->
+        <section id="home" class="page-section active-page">
+            <div class="flex flex-col lg:flex-row items-center justify-between py-12">
+                <div class="lg:w-1/2 text-center lg:text-left mb-8 lg:mb-0">
+                    <span class="text-sm font-semibold text-gray-500">Government of Odisha Health Initiative</span>
+                    <h1 class="text-5xl font-extrabold text-gray-900 leading-tight mt-2">Your Preventive Health Assistant</h1>
+                    <p class="mt-4 text-lg text-gray-600">Comprehensive healthcare guidance, vaccination tracking, AI-powered symptom analysis, and instant access to health services across Odisha.</p>
+                    <div class="mt-8 flex justify-center lg:justify-start space-x-4">
+                        <button class="glowing-btn" onclick="showPage('symptoms')">Start Health Check <i class="fas fa-arrow-right ml-2"></i></button>
+                        <button onclick="showPage('vaccines')" class="bg-white text-gray-700 hover:bg-gray-100 border border-gray-300 rounded-full px-8 py-3 font-semibold transition duration-300">View Vaccination Schedule</button>
+                    </div>
+                    <div class="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
+                        <div class="p-6 bg-white rounded-xl shadow-lg flex flex-col items-center">
+                            <span class="text-4xl text-[#00bf8b]">98%</span>
+                            <p class="mt-2 text-gray-600">Vaccination Coverage</p>
+                        </div>
+                        <div class="p-6 bg-white rounded-xl shadow-lg flex flex-col items-center">
+                            <span class="text-4xl text-[#00bf8b]">50M+</span>
+                            <p class="mt-2 text-gray-600">People Served</p>
+                        </div>
+                        <div class="p-6 bg-white rounded-xl shadow-lg flex flex-col items-center">
+                            <span class="text-4xl text-[#00bf8b]">24/7</span>
+                            <p class="mt-2 text-gray-600">Health Support</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="lg:w-1/2 flex justify-center">
+                    <div class="relative w-full max-w-lg aspect-square rounded-3xl bg-gradient-to-br from-green-200 to-blue-200 p-4">
+                        <div class="absolute top-4 left-4 bg-white rounded-lg p-3 shadow-md flex items-center space-x-2">
+                            <i class="fas fa-robot text-[#00bf8b]"></i>
+                            <span class="font-semibold text-sm">AI Assistant</span>
+                            <span class="text-gray-500 text-xs">Always ready to help</span>
+                        </div>
+                        <div class="absolute bottom-4 left-4 bg-white rounded-lg p-3 shadow-md flex items-center space-x-2">
+                            <i class="fas fa-lock text-[#00bf8b]"></i>
+                            <span class="font-semibold text-sm">Secure & Private</span>
+                            <span class="text-gray-500 text-xs">Your data is protected</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Prevention Page Section -->
+        <section id="prevention" class="page-section">
+            <h2 class="text-4xl font-bold text-center mb-2 text-gray-900">
+                <i class="fas fa-bolt text-[#00bf8b] mr-2"></i>Quick Health Tips
+            </h2>
+            <p class="text-center text-gray-600 mb-12">Essential preventive care tips for common health issues in Odisha. Click on any tip to learn more about prevention and care.</p>
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+                <button class="bg-red-500 text-white rounded-lg p-6 flex flex-col items-center justify-center text-center shadow-lg transform transition duration-300 hover:scale-105" onclick="showTip('dengue')">
+                    <i class="fas fa-mosquito-net text-4xl mb-2"></i>
+                    <p class="font-semibold text-sm">Dengue Prevention</p>
+                </button>
+                <button class="bg-blue-500 text-white rounded-lg p-6 flex flex-col items-center justify-center text-center shadow-lg transform transition duration-300 hover:scale-105" onclick="showTip('diarrhea')">
+                    <i class="fas fa-toilet text-4xl mb-2"></i>
+                    <p class="font-semibold text-sm">Diarrhea Care</p>
+                </button>
+                <button class="bg-gray-700 text-white rounded-lg p-6 flex flex-col items-center justify-center text-center shadow-lg transform transition duration-300 hover:scale-105" onclick="showTip('covid')">
+                    <i class="fas fa-virus text-4xl mb-2"></i>
+                    <p class="font-semibold text-sm">COVID Protection</p>
+                </button>
+                <button class="bg-pink-500 text-white rounded-lg p-6 flex flex-col items-center justify-center text-center shadow-lg transform transition duration-300 hover:scale-105" onclick="showTip('maternal')">
+                    <i class="fas fa-baby text-4xl mb-2"></i>
+                    <p class="font-semibold text-sm">Maternal Care</p>
+                </button>
+                <button class="bg-[#00bf8b] text-white rounded-lg p-6 flex flex-col items-center justify-center text-center shadow-lg transform transition duration-300 hover:scale-105" onclick="showTip('vaccination')">
+                    <i class="fas fa-syringe text-4xl mb-2"></i>
+                    <p class="font-semibold text-sm">Vaccination</p>
+                </button>
+                <button class="bg-purple-500 text-white rounded-lg p-6 flex flex-col items-center justify-center text-center shadow-lg transform transition duration-300 hover:scale-105" onclick="showTip('malaria')">
+                    <i class="fas fa-disease text-4xl mb-2"></i>
+                    <p class="font-semibold text-sm">Malaria Prevention</p>
+                </button>
+                <button class="bg-teal-500 text-white rounded-lg p-6 flex flex-col items-center justify-center text-center shadow-lg transform transition duration-300 hover:scale-105" onclick="showTip('personal_hygiene')">
+                    <i class="fas fa-hands-wash text-4xl mb-2"></i>
+                    <p class="font-semibold text-sm">Personal Hygiene</p>
+                </button>
+            </div>
+
+            <!-- Tip Details Display Section -->
+            <div id="tip-display" class="hidden mt-12 bg-white p-8 rounded-2xl shadow-lg opacity-0 transition-opacity duration-500">
+                <h3 id="tip-title" class="text-xl font-bold text-gray-800 mb-4"></h3>
+                <p id="tip-content" class="text-gray-600"></p>
+            </div>
+        </section>
+       
+        <!-- Vaccines Page Section -->
+        <section id="vaccines" class="page-section">
+            <h2 class="text-4xl font-bold text-center mb-2 text-gray-900">
+                <i class="fas fa-hand-holding-medical text-[#00bf8b] mr-2"></i>Polio Vaccination Schedule
+            </h2>
+            <p class="text-center text-gray-600 mb-12">Track your child's polio vaccination progress. Complete all doses on time to ensure maximum protection against poliomyelitis.</p>
+            <div class="flex flex-col lg:flex-row gap-6">
+                <!-- OPV Doses Timeline -->
+                <div class="lg:w-2/3 bg-white p-6 rounded-2xl shadow-lg">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-lg font-semibold text-gray-700">OPV Doses Timeline</h3>
+                    </div>
+                   
+                    <div class="space-y-6">
+                        <!-- Dose 0 -->
+                        <div class="flex items-start" data-dose="0">
+                            <div class="relative flex-shrink-0">
+                                <div class="w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center font-bold">1</div>
+                                <div class="absolute top-0 -left-2 mt-1 -ml-1 text-sm text-red-500">
+                                    <span class="px-2 py-0.5 rounded-full bg-red-100 font-bold">Critical</span>
+                                </div>
+                            </div>
+                            <div class="ml-4 flex-grow border-b border-gray-200 pb-4">
+                                <h4 class="font-semibold text-gray-800">OPV-0</h4>
+                                <p class="text-sm text-gray-500">0-1 day</p>
+                                <p class="text-sm text-gray-600 mt-1">Birth dose - given immediately after birth</p>
+                            </div>
+                            <button class="mark-btn ml-4 text-sm text-[#00bf8b] font-semibold hover:underline" onclick="markDoseComplete(0)">Mark Complete</button>
+                        </div>
+                        <!-- Line between doses -->
+                        <div class="w-0.5 bg-gray-300 h-8 ml-4"></div>
+                       
+                        <!-- Dose 1 -->
+                        <div class="flex items-start" data-dose="1">
+                            <div class="relative flex-shrink-0">
+                                <div class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold">2</div>
+                            </div>
+                            <div class="ml-4 flex-grow border-b border-gray-200 pb-4">
+                                <h4 class="font-semibold text-gray-800">OPV-1</h4>
+                                <p class="text-sm text-gray-500">6 weeks</p>
+                                <p class="text-sm text-gray-600 mt-1">First dose at 6 weeks of age</p>
+                            </div>
+                            <button class="mark-btn ml-4 text-sm text-[#00bf8b] font-semibold hover:underline" onclick="markDoseComplete(1)">Mark Complete</button>
+                        </div>
+                        <!-- Line between doses -->
+                        <div class="w-0.5 bg-gray-300 h-8 ml-4"></div>
+
+                        <!-- Dose 2 -->
+                        <div class="flex items-start" data-dose="2">
+                            <div class="relative flex-shrink-0">
+                                <div class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold">3</div>
+                            </div>
+                            <div class="ml-4 flex-grow border-b border-gray-200 pb-4">
+                                <h4 class="font-semibold text-gray-800">OPV-2</h4>
+                                <p class="text-sm text-gray-500">10 weeks</p>
+                                <p class="text-sm text-gray-600 mt-1">Second dose at 10 weeks of age</p>
+                            </div>
+                            <button class="mark-btn ml-4 text-sm text-[#00bf8b] font-semibold hover:underline" onclick="markDoseComplete(2)">Mark Complete</button>
+                        </div>
+                        <!-- Line between doses -->
+                        <div class="w-0.5 bg-gray-300 h-8 ml-4"></div>
+                       
+                        <!-- Dose 3 -->
+                        <div class="flex items-start" data-dose="3">
+                            <div class="relative flex-shrink-0">
+                                <div class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold">4</div>
+                            </div>
+                            <div class="ml-4 flex-grow pb-4">
+                                <h4 class="font-semibold text-gray-800">OPV-3</h4>
+                                <p class="text-sm text-gray-500">14 weeks</p>
+                                <p class="text-sm text-gray-600 mt-1">Third dose at 14 weeks of age</p>
+                            </div>
+                            <button class="mark-btn ml-4 text-sm text-[#00bf8b] font-semibold hover:underline" onclick="markDoseComplete(3)">Mark Complete</button>
+                        </div>
+                    </div>
+                   
+                    <div class="mt-6 border-t pt-4">
+                        <p class="font-semibold text-gray-700">Vaccination Progress</p>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                            <div id="progress-bar" class="bg-teal-500 h-2.5 rounded-full" style="width: 0%;"></div>
+                        </div>
+                        <p id="progress-text" class="text-right text-gray-600 text-sm mt-1">0/4 doses</p>
+                    </div>
+                </div>
+               
+                <!-- Side Panel -->
+                <div class="lg:w-1/3 space-y-6">
+                    <!-- Set Reminders -->
+                    <div class="bg-white p-6 rounded-2xl shadow-lg">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-4">Set Reminders</h3>
+                        <p class="text-gray-600 text-sm mb-4">Never miss a vaccination date. Set up reminders for upcoming doses.</p>
+                        <button class="w-full bg-[#00bf8b] text-white py-2 rounded-xl font-semibold mb-2 shadow-md hover:bg-teal-600 transition duration-300" onclick="showNotification('Calendar reminder set!')">Set Calendar Reminder</button>
+                        <button class="w-full bg-gray-100 text-gray-700 py-2 rounded-xl font-semibold border border-gray-200 hover:bg-gray-200 transition duration-300" onclick="sendSmsReminder()">
+                            <i class="fas fa-sms mr-2"></i>SMS Reminder
+                        </button>
+                    </div>
+                    <!-- Important Information -->
+                    <div class="bg-white p-6 rounded-2xl shadow-lg">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-4">Important Information</h3>
+                        <ul class="text-sm text-gray-600 space-y-2">
+                            <li><i class="fas fa-check-circle text-green-500 mr-2"></i>OPV-0 should be given within 24 hours of birth</li>
+                            <li><i class="fas fa-check-circle text-green-500 mr-2"></i>Maintain a 4-week gap between subsequent doses</li>
+                            <li><i class="fas fa-check-circle text-green-500 mr-2"></i>Keep the vaccination card safe for future reference</li>
+                        </ul>
+                    </div>
+                    <!-- Next Dose Due -->
+                    <div class="bg-white p-6 rounded-2xl shadow-lg">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-4">Next Dose Due</h3>
+                        <p class="font-semibold text-gray-800">OPV-0</p>
+                        <p class="text-sm text-gray-600">Age: 0-1 day</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Appointments Page Section -->
+        <section id="appointments" class="page-section">
+            <h2 class="text-4xl font-bold text-center mb-2 text-gray-900">
+                <i class="fas fa-calendar-check text-[#00bf8b] mr-2"></i>Book Your Appointment
+            </h2>
+            <p class="text-center text-gray-600 mb-12">Schedule your visit to any health center in Odisha. Choose from vaccination, general checkup, consultation, or specialized care services.</p>
+            <div class="bg-white p-8 rounded-2xl shadow-lg max-w-4xl mx-auto">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Personal Information -->
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-700 mb-4">Personal Information</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label for="fullName" class="block text-sm font-medium text-gray-700">Full Name *</label>
+                                <input type="text" id="fullName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 p-2" placeholder="Enter your full name">
+                            </div>
+                            <div>
+                                <label for="phoneNumber" class="block text-sm font-medium text-gray-700">Phone Number *</label>
+                                <input type="tel" id="phoneNumber" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 p-2" placeholder="+91 XXXXX XXXXX">
+                            </div>
+                            <div>
+                                <label for="additionalNotes" class="block text-sm font-medium text-gray-700">Additional Notes</label>
+                                <textarea id="additionalNotes" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 p-2" placeholder="Any specific requirements or symptoms..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Appointment Details -->
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-700 mb-4">Appointment Details</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Service Type *</label>
+                                <div class="grid grid-cols-2 gap-2 mt-2">
+                                    <button class="service-type-btn flex items-center p-3 rounded-lg border border-[#00bf8b] bg-[#00bf8b] text-white transition duration-200" data-service="Vaccination">
+                                        <i class="fas fa-syringe mr-2"></i>Vaccination
+                                    </button>
+                                    <button class="service-type-btn flex items-center p-3 rounded-lg border border-gray-300 bg-gray-50 text-gray-700 hover:bg-gray-100 transition duration-200" data-service="General Checkup">
+                                        <i class="fas fa-hospital mr-2"></i>General Checkup
+                                    </button>
+                                    <button class="service-type-btn flex items-center p-3 rounded-lg border border-gray-300 bg-gray-50 text-gray-700 hover:bg-gray-100 transition duration-200" data-service="Consultation">
+                                        <i class="fas fa-user-md mr-2"></i>Consultation
+                                    </button>
+                                    <button class="service-type-btn flex items-center p-3 rounded-lg border border-gray-300 bg-gray-50 text-gray-700 hover:bg-gray-100 transition duration-200" data-service="Maternal Care">
+                                        <i class="fas fa-baby mr-2"></i>Maternal Care
+                                    </button>
+                                    <button class="service-type-btn flex items-center p-3 rounded-lg border border-gray-300 bg-gray-50 text-gray-700 hover:bg-gray-100 transition duration-200" data-service="Pediatric Care">
+                                        <i class="fas fa-child mr-2"></i>Pediatric Care
+                                    </button>
+                                    <button class="service-type-btn flex items-center p-3 rounded-lg border border-gray-300 bg-gray-50 text-gray-700 hover:bg-gray-100 transition duration-200" data-service="Dental Care">
+                                        <i class="fas fa-tooth mr-2"></i>Dental Care
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label for="appointmentDate" class="block text-sm font-medium text-gray-700">Date *</label>
+                                    <input type="date" id="appointmentDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                                </div>
+                                <div>
+                                    <label for="appointmentTime" class="block text-sm font-medium text-gray-700">Time *</label>
+                                    <input type="time" id="appointmentTime" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                                </div>
+                            </div>
+                            <div>
+                                <label for="healthCenter" class="block text-sm font-medium text-gray-700">Health Center *</label>
+                                <select id="healthCenter" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                                    <option>Select health center</option>
+                                    <option>Primary Health Center - Badamba</option>
+                                    <option>Community Health Center - Banki</option>
+                                    <option>District Hospital - Cuttack</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-8 text-center">
+                    <button class="glowing-btn w-full lg:w-auto" onclick="bookAppointment()">Book Appointment</button>
+                    <p class="mt-4 text-xs text-gray-500">You will receive a confirmation SMS with your appointment details.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Symptoms Page Section -->
+        <section id="symptoms" class="page-section">
+            <h2 class="text-4xl font-bold text-center mb-2 text-gray-900">
+                <i class="fas fa-robot text-[#00bf8b] mr-2"></i>AI Symptom Checker
+            </h2>
+            <p class="text-center text-gray-600 mb-12">Select your symptoms for AI-powered health assessment. This is for educational purposes only and should not replace professional medical advice.</p>
+            <div class="bg-white p-8 rounded-2xl shadow-lg max-w-4xl mx-auto">
+                <h3 class="text-lg font-semibold text-gray-700 mb-4">Select your symptoms:</h3>
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4" id="symptom-buttons">
+                    <button class="symptom-btn flex flex-col items-center justify-center p-6 bg-gray-100 rounded-xl shadow-md hover:bg-gray-200 transition duration-300" data-symptom="Fever">
+                        <i class="fas fa-thermometer-half text-4xl mb-2 text-gray-600"></i>
+                        <span class="font-semibold text-gray-800">Fever</span>
+                    </button>
+                    <button class="symptom-btn flex flex-col items-center justify-center p-6 bg-gray-100 rounded-xl shadow-md hover:bg-gray-200 transition duration-300" data-symptom="Cough">
+                        <i class="fas fa-head-side-cough text-4xl mb-2 text-gray-600"></i>
+                        <span class="font-semibold text-gray-800">Cough</span>
+                    </button>
+                    <button class="symptom-btn flex flex-col items-center justify-center p-6 bg-gray-100 rounded-xl shadow-md hover:bg-gray-200 transition duration-300" data-symptom="Headache">
+                        <i class="fas fa-head-side-mask text-4xl mb-2 text-gray-600"></i>
+                        <span class="font-semibold text-gray-800">Headache</span>
+                    </button>
+                    <button class="symptom-btn flex flex-col items-center justify-center p-6 bg-gray-100 rounded-xl shadow-md hover:bg-gray-200 transition duration-300" data-symptom="Body Ache">
+                        <i class="fas fa-user-injured text-4xl mb-2 text-gray-600"></i>
+                        <span class="font-semibold text-gray-800">Body Ache</span>
+                    </button>
+                    <button class="symptom-btn flex flex-col items-center justify-center p-6 bg-gray-100 rounded-xl shadow-md hover:bg-gray-200 transition duration-300" data-symptom="Vomiting">
+                        <i class="fas fa-vomit text-4xl mb-2 text-gray-600"></i>
+                        <span class="font-semibold text-gray-800">Vomiting</span>
+                    </button>
+                    <button class="symptom-btn flex flex-col items-center justify-center p-6 bg-gray-100 rounded-xl shadow-md hover:bg-gray-200 transition duration-300" data-symptom="Diarrhea">
+                        <i class="fas fa-poo-storm text-4xl mb-2 text-gray-600"></i>
+                        <span class="font-semibold text-gray-800">Diarrhea</span>
+                    </button>
+                    <button class="symptom-btn flex flex-col items-center justify-center p-6 bg-gray-100 rounded-xl shadow-md hover:bg-gray-200 transition duration-300" data-symptom="Skin Rash">
+                        <i class="fas fa-exclamation text-4xl mb-2 text-gray-600"></i>
+                        <span class="font-semibold text-gray-800">Skin Rash</span>
+                    </button>
+                    <button class="symptom-btn flex flex-col items-center justify-center p-6 bg-gray-100 rounded-xl shadow-md hover:bg-gray-200 transition duration-300" data-symptom="Fatigue">
+                        <i class="fas fa-bed text-4xl mb-2 text-gray-600"></i>
+                        <span class="font-semibold text-gray-800">Fatigue</span>
+                    </button>
+                    <button class="symptom-btn flex flex-col items-center justify-center p-6 bg-gray-100 rounded-xl shadow-md hover:bg-gray-200 transition duration-300" data-symptom="Breathing Issues">
+                        <i class="fas fa-lungs text-4xl mb-2 text-gray-600"></i>
+                        <span class="font-semibold text-gray-800">Breathing Issues</span>
+                    </button>
+                    <button class="symptom-btn flex flex-col items-center justify-center p-6 bg-gray-100 rounded-xl shadow-md hover:bg-gray-200 transition duration-300" data-symptom="Chest Pain">
+                        <i class="fas fa-heartbeat text-4xl mb-2 text-gray-600"></i>
+                        <span class="font-semibold text-gray-800">Chest Pain</span>
+                    </button>
+                    <button class="symptom-btn flex flex-col items-center justify-center p-6 bg-gray-100 rounded-xl shadow-md hover:bg-gray-200 transition duration-300" data-symptom="Dizziness">
+                        <i class="fas fa-dizzy text-4xl mb-2 text-gray-600"></i>
+                        <span class="font-semibold text-gray-800">Dizziness</span>
+                    </button>
+                    <button class="symptom-btn flex flex-col items-center justify-center p-6 bg-gray-100 rounded-xl shadow-md hover:bg-gray-200 transition duration-300" data-symptom="Nausea">
+                        <i class="fas fa-pills text-4xl mb-2 text-gray-600"></i>
+                        <span class="font-semibold text-gray-800">Nausea</span>
+                    </button>
+                </div>
+                <div class="mt-8 text-center">
+                    <button class="glowing-btn" onclick="analyzeSymptoms()">
+                        <i class="fas fa-stethoscope mr-2"></i>Analyze Symptoms
+                    </button>
+                </div>
+                <div id="symptom-results" class="hidden mt-8 p-6 bg-blue-50 border-l-4 border-blue-400 rounded-md">
+                    <h4 class="font-bold text-blue-800 mb-2">Analysis Results</h4>
+                    <p id="symptom-result-text" class="text-blue-700"></p>
+                </div>
+            </div>
+        </section>
+       
+        <!-- AI Analysis Page Section -->
+        <section id="ai-analysis" class="page-section">
+            <h2 class="text-4xl font-bold text-center mb-2 text-gray-900">
+                <i class="fas fa-brain text-[#00bf8b] mr-2"></i>AI Medical Image Analysis
+            </h2>
+            <p class="text-center text-gray-600 mb-12">Upload medical images for AI-powered preliminary analysis. This tool provides educational insights and should not replace professional medical diagnosis.</p>
+            <div class="bg-white p-8 rounded-2xl shadow-lg max-w-4xl mx-auto">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Upload Medical Image -->
+                    <div class="text-center">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-4">Upload Medical Image</h3>
+                        <div class="border-2 border-dashed border-gray-300 rounded-xl p-8 flex flex-col items-center justify-center">
+                            <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
+                            <p class="text-sm text-gray-600">Click to select or drag and drop an image.</p>
+                            <p class="text-xs text-gray-500 mt-1">Supported: JPG, PNG, WebP (Max 5MB)</p>
+                        </div>
+                        <div class="mt-4 flex justify-center space-x-4">
+                            <input type="file" id="image-upload" class="hidden" accept="image/*" onchange="handleImageUpload()">
+                            <button class="bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-xl font-semibold hover:bg-gray-100 transition duration-200" onclick="document.getElementById('image-upload').click()"><i class="fas fa-folder-open mr-2"></i>Choose File</button>
+                            <button class="bg-[#00bf8b] text-white py-2 px-4 rounded-xl font-semibold hover:bg-teal-600 transition duration-200" onclick="handleTakePhoto()"><i class="fas fa-camera mr-2"></i>Take Photo</button>
+                        </div>
+                    </div>
+                    <!-- Analysis Results -->
+                    <div class="text-center">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-4">Analysis Results</h3>
+                        <div class="border-2 border-dashed border-gray-300 rounded-xl p-8 flex flex-col items-center justify-center h-full">
+                            <p id="analysis-results-text" class="text-sm text-gray-600">Upload an image and click analyze to see AI-powered insights</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-8">
+                    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-md shadow-sm">
+                        <h4 class="font-bold text-yellow-800">Important Medical Disclaimer</h4>
+                        <ul class="text-yellow-700 text-sm list-disc list-inside mt-2 space-y-1">
+                            <li>This AI analysis is for educational and screening purposes only</li>
+                            <li>Results should not replace professional medical diagnosis</li>
+                            <li>Always consult qualified healthcare providers for medical advice</li>
+                            <li>Images are processed locally and not stored on our servers</li>
+                            <li>For urgent medical conditions, seek immediate medical attention</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+       
+        <!-- Services Page Section -->
+        <section id="services" class="page-section">
+            <h2 class="text-4xl font-bold text-center mb-2 text-gray-900">
+                <i class="fas fa-map-marker-alt text-[#00bf8b] mr-2"></i>Nearby Health Centers
+            </h2>
+            <p class="text-center text-gray-600 mb-12">Find health centers, hospitals, and medical facilities near your location. Get directions, contact information, and service details.</p>
+            <div class="mb-8 flex justify-center flex-wrap gap-2">
+                <button class="bg-white border border-gray-300 text-gray-700 px-6 py-2 rounded-full font-semibold hover:bg-gray-100 transition duration-200 active:bg-gray-200 active:ring-2 active:ring-gray-300">All Centers</button>
+                <button class="bg-white border border-gray-300 text-gray-700 px-6 py-2 rounded-full font-semibold hover:bg-gray-100 transition duration-200">Primary Health</button>
+                <button class="bg-white border border-gray-300 text-gray-700 px-6 py-2 rounded-full font-semibold hover:bg-gray-100 transition duration-200">Community Health</button>
+                <button class="bg-white border border-gray-300 text-gray-700 px-6 py-2 rounded-full font-semibold hover:bg-gray-100 transition duration-200">Emergency</button>
+                <button class="bg-white border border-gray-300 text-gray-700 px-6 py-2 rounded-full font-semibold hover:bg-gray-100 transition duration-200">Specialist Care</button>
+            </div>
+            <div class="mb-8 text-center">
+                <button class="bg-white border border-gray-300 text-gray-700 px-6 py-2 rounded-full font-semibold hover:bg-gray-100 transition duration-200" onclick="detectLocation()"><i class="fas fa-location-crosshairs mr-2"></i>Detect My Location</button>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Center Card 1 -->
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="font-bold text-lg text-gray-800">Primary Health Center - Badamba</h4>
+                        <span class="text-sm text-yellow-500"><i class="fas fa-star mr-1"></i>4.2</span>
+                    </div>
+                    <p class="text-sm text-gray-500 mb-2"><i class="fas fa-map-marker-alt mr-2"></i>3.3 km | Badamba, Cuttack District</p>
+                    <p class="font-semibold text-gray-700 mb-1">Available Services:</p>
+                    <div class="flex flex-wrap gap-2 text-xs">
+                        <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full">Vaccination</span>
+                        <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full">General OPD</span>
+                        <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">Maternal Care</span>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-4">
+                        <i class="fas fa-clock mr-2"></i>9:00 AM - 5:00 PM
+                    </p>
+                    <div class="mt-6 flex space-x-4">
+                        <button class="w-1/2 glowing-btn" onclick="getDirections('Primary Health Center - Badamba')"><i class="fas fa-directions mr-2"></i>Directions</button>
+                        <button class="w-1/2 bg-white text-gray-700 py-2 rounded-xl border border-gray-300 font-semibold hover:bg-gray-100 transition duration-200" onclick="makeCall('108')"><i class="fas fa-phone-alt mr-2"></i>Call</button>
+                    </div>
+                </div>
+                <!-- Center Card 2 -->
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="font-bold text-lg text-gray-800">Community Health Center - Banki</h4>
+                        <span class="text-sm text-yellow-500"><i class="fas fa-star mr-1"></i>4.5</span>
+                    </div>
+                    <p class="text-sm text-gray-500 mb-2"><i class="fas fa-map-marker-alt mr-2"></i>9.7 km | Banki, Cuttack District</p>
+                    <p class="font-semibold text-gray-700 mb-1">Available Services:</p>
+                    <div class="flex flex-wrap gap-2 text-xs">
+                        <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full">Surgery</span>
+                        <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full">Emergency</span>
+                        <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">Specialist Care</span>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-4">
+                        <i class="fas fa-clock mr-2"></i>24/7
+                    </p>
+                    <div class="mt-6 flex space-x-4">
+                        <button class="w-1/2 glowing-btn" onclick="getDirections('Community Health Center - Banki')"><i class="fas fa-directions mr-2"></i>Directions</button>
+                        <button class="w-1/2 bg-white text-gray-700 py-2 rounded-xl border border-gray-300 font-semibold hover:bg-gray-100 transition duration-200" onclick="makeCall('108')"><i class="fas fa-phone-alt mr-2"></i>Call</button>
+                    </div>
+                </div>
+                <!-- Center Card 3 -->
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="font-bold text-lg text-gray-800">District Hospital - Cuttack</h4>
+                        <span class="text-sm text-yellow-500"><i class="fas fa-star mr-1"></i>4.3</span>
+                    </div>
+                    <p class="text-sm text-gray-500 mb-2"><i class="fas fa-map-marker-alt mr-2"></i>12.1 km | Cuttack City, Odisha</p>
+                    <p class="font-semibold text-gray-700 mb-1">Available Services:</p>
+                    <div class="flex flex-wrap gap-2 text-xs">
+                        <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full">All Specialties</span>
+                        <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full">Emergency</span>
+                        <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">24/7</span>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-4">
+                        <i class="fas fa-clock mr-2"></i>24/7
+                    </p>
+                    <div class="mt-6 flex space-x-4">
+                        <button class="w-1/2 glowing-btn" onclick="getDirections('District Hospital - Cuttack')"><i class="fas fa-directions mr-2"></i>Directions</button>
+                        <button class="w-1/2 bg-white text-gray-700 py-2 rounded-xl border border-gray-300 font-semibold hover:bg-gray-100 transition duration-200" onclick="makeCall('108')"><i class="fas fa-phone-alt mr-2"></i>Call</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dashboard Page Section -->
+        <section id="dashboard" class="page-section">
+            <!-- Emergency Contacts -->
+            <div class="bg-white p-8 rounded-2xl shadow-lg max-w-4xl mx-auto mb-8">
+                <h3 class="text-lg font-semibold text-gray-700 mb-4">Emergency Contacts</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
+                    <div class="p-4 rounded-xl bg-red-50 hover:bg-red-100 transition duration-200" onclick="makeCall('108')">
+                        <i class="fas fa-ambulance text-4xl text-red-500 mb-2"></i>
+                        <p class="font-semibold text-gray-800">Ambulance</p>
+                        <p class="text-xl font-bold text-red-500">108</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-blue-50 hover:bg-blue-100 transition duration-200" onclick="makeCall('102')">
+                        <i class="fas fa-hands-helping text-4xl text-blue-500 mb-2"></i>
+                        <p class="font-semibold text-gray-800">Medical Helpline</p>
+                        <p class="text-xl font-bold text-blue-500">102</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-gray-100 hover:bg-gray-200 transition duration-200" onclick="makeCall('100')">
+                        <i class="fas fa-shield-alt text-4xl text-gray-600 mb-2"></i>
+                        <p class="font-semibold text-gray-800">Police</p>
+                        <p class="text-xl font-bold text-gray-600">100</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Content -->
+            <div class="flex flex-col items-center mb-8">
+                <h2 class="text-4xl font-bold mb-2 text-gray-900">
+                    <i class="fas fa-chart-line text-[#00bf8b] mr-2"></i>Vaccination Coverage Dashboard
+                </h2>
+                <p class="text-center text-gray-600">Real-time vaccination coverage statistics across Odisha. Monitor progress, track campaigns, and ensure comprehensive immunization coverage.</p>
+            </div>
+           
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center text-center">
+                    <i class="fas fa-users text-4xl text-blue-500 mb-2"></i>
+                    <span class="text-2xl font-bold text-gray-900">50.2M</span>
+                    <p class="text-sm text-gray-600">Total Population</p>
+                </div>
+                <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center text-center">
+                    <i class="fas fa-chart-pie text-4xl text-green-500 mb-2"></i>
+                    <span class="text-2xl font-bold text-gray-900">92.3%</span>
+                    <p class="text-sm text-gray-600">Overall Coverage</p>
+                </div>
+                <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center text-center">
+                    <i class="fas fa-bullhorn text-4xl text-yellow-500 mb-2"></i>
+                    <span class="text-2xl font-bold text-gray-900">3</span>
+                    <p class="text-sm text-gray-600">Active Campaigns</p>
+                </div>
+                <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center text-center">
+                    <i class="fas fa-arrow-up text-4xl text-teal-500 mb-2"></i>
+                    <span class="text-2xl font-bold text-gray-900">+2.8%</span>
+                    <p class="text-sm text-gray-600">Monthly Growth</p>
+                </div>
+            </div>
+           
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <!-- Vaccination Coverage by Type -->
+                <div class="bg-white p-6 rounded-2xl shadow-lg">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-4">Vaccination Coverage by Type</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center">
+                            <span class="w-24 text-sm text-gray-600">Polio</span>
+                            <div class="flex-grow bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-teal-500 h-2.5 rounded-full" style="width: 95%;"></div>
+                            </div>
+                            <span class="ml-4 text-sm font-semibold text-gray-800">95%</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="w-24 text-sm text-gray-600">Measles</span>
+                            <div class="flex-grow bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-red-500 h-2.5 rounded-full" style="width: 90%;"></div>
+                            </div>
+                            <span class="ml-4 text-sm font-semibold text-gray-800">90%</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="w-24 text-sm text-gray-600">DPT</span>
+                            <div class="flex-grow bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-yellow-500 h-2.5 rounded-full" style="width: 85%;"></div>
+                            </div>
+                            <span class="ml-4 text-sm font-semibold text-gray-800">85%</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="w-24 text-sm text-gray-600">Hepatitis B</span>
+                            <div class="flex-grow bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-orange-500 h-2.5 rounded-full" style="width: 80%;"></div>
+                            </div>
+                            <span class="ml-4 text-sm font-semibold text-gray-800">80%</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- District-wise Coverage -->
+                <div class="bg-white p-6 rounded-2xl shadow-lg">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-4">District-wise Coverage</h3>
+                    <div class="grid grid-cols-2 gap-y-4 text-sm">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Cuttack</span>
+                            <span class="font-semibold text-gray-800">95%</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Bhubaneswar</span>
+                            <span class="font-semibold text-gray-800">97%</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Berhampur</span>
+                            <span class="font-semibold text-gray-800">89%</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Sambalpur</span>
+                            <span class="font-semibold text-gray-800">91%</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Rourkela</span>
+                            <span class="font-semibold text-gray-800">93%</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Puri</span>
+                            <span class="font-semibold text-gray-800">88%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+           
+            <!-- Current Vaccination Campaigns -->
+            <div class="bg-white p-6 rounded-2xl shadow-lg mb-8">
+                <h3 class="text-lg font-semibold text-gray-700 mb-4">Current Vaccination Campaigns</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="p-4 bg-green-50 rounded-lg border-l-4 border-green-500">
+                        <span class="font-semibold text-sm text-green-700">completed</span>
+                        <h4 class="font-bold text-gray-800 mt-1">Polio National Immunization Day</h4>
+                        <p class="text-xs text-gray-500 mt-2">Date: January 28, 2024</p>
+                        <p class="text-xs text-gray-500">Target: 2.1M children</p>
+                        <p class="text-xs text-gray-500">Coverage: <span class="font-bold text-green-700">99.2%</span></p>
+                    </div>
+                    <div class="p-4 bg-yellow-50 rounded-lg border-l-4 border-yellow-500">
+                        <span class="font-semibold text-sm text-yellow-700">ongoing</span>
+                        <h4 class="font-bold text-gray-800 mt-1">Measles-Rubella Campaign</h4>
+                        <p class="text-xs text-gray-500 mt-2">Date: March 15, 2024</p>
+                        <p class="text-xs text-gray-500">Target: 1.8M children</p>
+                        <p class="text-xs text-gray-500">Coverage: <span class="font-bold text-yellow-700">67.8%</span></p>
+                    </div>
+                    <div class="p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+                        <span class="font-semibold text-sm text-blue-700">upcoming</span>
+                        <h4 class="font-bold text-gray-800 mt-1">World Immunization Week</h4>
+                        <p class="text-xs text-gray-500 mt-2">Date: April 24-30, 2024</p>
+                        <p class="text-xs text-gray-500">Target: 2.5M children</p>
+                        <p class="text-xs text-gray-500">Coverage: <span class="font-bold text-blue-700">0%</span></p>
+                    </div>
+                </div>
+            </div>
+           
+            <!-- Key Achievements -->
+            <div class="bg-white p-6 rounded-2xl shadow-lg">
+                <h3 class="text-lg font-semibold text-gray-700 mb-4">Key Achievements</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
+                    <div class="p-4 rounded-xl">
+                        <i class="fas fa-trophy text-4xl text-yellow-500 mb-2"></i>
+                        <p class="font-semibold text-gray-800">Polio-Free Status</p>
+                        <p class="text-sm text-gray-600">Maintained for 10+ years</p>
+                    </div>
+                    <div class="p-4 rounded-xl">
+                        <i class="fas fa-award text-4xl text-blue-500 mb-2"></i>
+                        <p class="font-semibold text-gray-800">WHO Recognition</p>
+                        <p class="text-sm text-gray-600">Excellence in Immunization</p>
+                    </div>
+                    <div class="p-4 rounded-xl">
+                        <i class="fas fa-globe text-4xl text-teal-500 mb-2"></i>
+                        <p class="font-semibold text-gray-800">Digital Tracking</p>
+                        <p class="text-sm text-gray-600">100% centers connected</p>
+                    </div>
+                </div>
+            </div>
+            <p class="text-center text-xs text-gray-400 mt-8">Data sources: Ministry of Health & Family Welfare, Government of Odisha | Last updated: 9/14/2025</p>
+        </section>
+
+    </main>
+   
+    <!-- Notification Box -->
+    <div id="notification-box" class="notification-box">
+        <span id="notification-message"></span>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-[#00bf8b] text-white py-12 mt-12">
+        <div class="container mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+                <h3 class="font-bold text-lg mb-4">Odisha Health Assistant</h3>
+                <p class="text-sm">Your trusted partner for preventive healthcare and wellness in Odisha.</p>
+            </div>
+            <div>
+                <h4 class="font-bold text-sm mb-4">Quick Links</h4>
+                <ul class="text-sm space-y-2">
+                    <li><a href="#" onclick="showPage('vaccines')" class="hover:underline">Vaccination</a></li>
+                    <li><a href="#" onclick="showPage('symptoms')" class="hover:underline">Symptom Checker</a></li>
+                    <li><a href="#" onclick="showPage('appointments')" class="hover:underline">Book Appointment</a></li>
+                    <li><a href="#" onclick="showPage('services')" class="hover:underline">Health Centers</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold text-sm mb-4">Emergency</h4>
+                <ul class="text-sm space-y-2">
+                    <li><a href="#" onclick="makeCall('108')" class="hover:underline">108 - Ambulance</a></li>
+                    <li><a href="#" onclick="makeCall('102')" class="hover:underline">102 - Medical Helpline</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold text-sm mb-4">Contact</h4>
+                <p class="text-sm">Government of Odisha<br>Electronics & IT Department<br>MedTech / HealthTech Initiative</p>
+            </div>
+        </div>
+        <div class="container mx-auto px-4 mt-8 text-center text-sm">
+            <p>© 2024 Government of Odisha. All rights reserved. Healthcare data is processed securely.</p>
+        </div>
+    </footer>
+
+    <!-- Floating Chat Bubble -->
+    <div class="chat-bubble" onclick="openWhatsAppChat()">
+        <i class="fab fa-whatsapp text-2xl"></i>
+    </div>
+   
+    <script>
+        // State to track completed doses
+        const doses = [
+            { id: 0, completed: false, name: "OPV-0" },
+            { id: 1, completed: false, name: "OPV-1" },
+            { id: 2, completed: false, name: "OPV-2" },
+            { id: 3, completed: false, name: "OPV-3" }
+        ];
+
+        // JavaScript to handle single-page navigation
+        function showPage(pageId) {
+            // Get all page sections and nav links
+            const pages = document.querySelectorAll('.page-section');
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            // Hide all pages
+            pages.forEach(page => page.classList.remove('active-page'));
+           
+            // Deactivate all nav links
+            navLinks.forEach(link => link.classList.remove('active'));
+
+            // Show the selected page and activate the corresponding nav link
+            const activePage = document.getElementById(pageId);
+            if (activePage) {
+                activePage.classList.add('active-page');
+                const activeNavLink = document.querySelector(`a[href="#${pageId}"]`);
+                if (activeNavLink) {
+                    activeNavLink.classList.add('active');
+                }
+            }
+        }
+       
+        // Function to update the vaccination progress bar
+        function updateProgress() {
+            const completedDoses = doses.filter(d => d.completed).length;
+            const totalDoses = doses.length;
+            const progress = (completedDoses / totalDoses) * 100;
+
+            const progressBar = document.getElementById('progress-bar');
+            const progressText = document.getElementById('progress-text');
+
+            if (progressBar && progressText) {
+                progressBar.style.width = `${progress}%`;
+                progressText.innerText = `${completedDoses}/${totalDoses} doses`;
+            }
+
+            // Update button states
+            doses.forEach((dose, index) => {
+                const markBtn = document.querySelector(`[data-dose="${index}"] .mark-btn`);
+                if (dose.completed) {
+                    if (markBtn) {
+                        markBtn.disabled = true;
+                        markBtn.innerText = "Complete";
+                        markBtn.classList.remove('text-[#00bf8b]');
+                        markBtn.classList.add('text-gray-400');
+                    }
+                }
+            });
+        }
+
+        // Function to mark a dose as complete
+        function markDoseComplete(doseId) {
+            const dose = doses.find(d => d.id === doseId);
+            if (dose) {
+                dose.completed = true;
+                showNotification(`${dose.name} marked as complete!`);
+                updateProgress();
+            }
+        }
+
+        // Function to show a temporary notification box
+        function showNotification(message) {
+            const box = document.getElementById('notification-box');
+            const msg = document.getElementById('notification-message');
+            if (box && msg) {
+                msg.innerText = message;
+                box.classList.add('show');
+                setTimeout(() => {
+                    box.classList.remove('show');
+                }, 3000);
+            }
+        }
+
+        // Handle appointment form submission
+        function bookAppointment() {
+            const fullName = document.getElementById('fullName').value;
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            const appointmentDate = document.getElementById('appointmentDate').value;
+            const appointmentTime = document.getElementById('appointmentTime').value;
+            const healthCenter = document.getElementById('healthCenter').value;
+            const selectedService = document.querySelector('.service-type-btn.active');
+
+            // Basic validation
+            if (!fullName || !phoneNumber || !appointmentDate || !appointmentTime || healthCenter === "Select health center" || !selectedService) {
+                showNotification("Please fill out all required fields.");
+                return;
+            }
+
+            // Simulate booking and show success message
+            const service = selectedService.dataset.service;
+            const message = `Appointment for ${service} on ${appointmentDate} at ${appointmentTime} has been booked.`;
+            showNotification(message);
+        }
+
+        // Toggle symptom button active state
+        document.querySelectorAll('.symptom-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                button.classList.toggle('active');
+            });
+        });
+
+        // Handle symptom analysis
+        function analyzeSymptoms() {
+            const selectedSymptoms = Array.from(document.querySelectorAll('.symptom-btn.active')).map(btn => btn.dataset.symptom);
+            const resultsDiv = document.getElementById('symptom-results');
+            const resultsText = document.getElementById('symptom-result-text');
+
+            if (selectedSymptoms.length > 0) {
+                resultsDiv.classList.remove('hidden');
+                resultsText.innerHTML = `Based on your selected symptoms (${selectedSymptoms.join(', ')}), our AI suggests consulting a general physician for a detailed checkup. This could be related to a common cold or flu. For a professional diagnosis, please book an appointment.`;
+                showNotification("Symptom analysis complete!");
+            } else {
+                showNotification("Please select at least one symptom to analyze.");
+            }
+        }
+
+        // Handle image upload simulation
+        function handleImageUpload() {
+            const analysisText = document.getElementById('analysis-results-text');
+            analysisText.innerText = "Analyzing image...";
+            setTimeout(() => {
+                analysisText.innerText = "AI analysis complete. The image shows a rash on the skin. This could be due to an allergic reaction. Please consult a dermatologist for a professional opinion.";
+                showNotification("Image analysis complete!");
+            }, 2000);
+        }
+
+        function handleTakePhoto() {
+            showNotification("Taking a photo is not supported in this demo. Please use the 'Choose File' option.");
+        }
+
+        // Handle service type button selection
+        document.querySelectorAll('.service-type-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.service-type-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    btn.classList.remove('bg-[#00bf8b]', 'text-white');
+                    btn.classList.add('bg-gray-50', 'text-gray-700');
+                    btn.classList.remove('border-[#00bf8b]');
+                    btn.classList.add('border-gray-300');
+                });
+                button.classList.add('active');
+                button.classList.add('bg-[#00bf8b]', 'text-white');
+                button.classList.remove('bg-gray-50', 'text-gray-700');
+                button.classList.add('border-[#00bf8b]');
+                button.classList.remove('border-gray-300');
+            });
+        });
+
+        // Function to simulate location detection
+        function detectLocation() {
+            showNotification("Simulating location detection. Showing nearby health centers based on a default location.");
+        }
+       
+        // Function to simulate a call action
+        function makeCall(number) {
+            showNotification(`Simulating a call to ${number}.`);
+            // In a real app, this would use a tel: link or native API
+            // window.location.href = `tel:${number}`;
+        }
+       
+        // Function to simulate getting directions
+        function getDirections(destination) {
+            showNotification(`Simulating directions to ${destination}.`);
+            // In a real app, this would open a map app
+            // window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}`, '_blank');
+        }
+
+        // Function to show health tips
+        function showTip(tipId) {
+            const tips = {
+                'dengue': {
+                    title: 'Dengue Prevention',
+                    content: 'To prevent dengue, eliminate all standing water sources around your home. Use mosquito repellent, wear long sleeves, and ensure screens on windows and doors are intact.'
+                },
+                'diarrhea': {
+                    title: 'Diarrhea Care',
+                    content: 'To prevent diarrhea, ensure safe drinking water by boiling or using a filter. Practice proper hand hygiene, especially before eating and after using the restroom. Wash fruits and vegetables thoroughly.'
+                },
+                'covid': {
+                    title: 'COVID Protection',
+                    content: 'To prevent COVID, get vaccinated and wear a mask in crowded indoor spaces. Maintain physical distance, wash your hands frequently, and avoid touching your face.'
+                },
+                'maternal': {
+                    title: 'Maternal Care',
+                    content: 'For maternal care, attend all scheduled prenatal checkups. Maintain a healthy diet with essential nutrients, stay hydrated, and follow your doctor\'s advice for rest and activity.'
+                },
+                'vaccination': {
+                    title: 'Vaccination',
+                    content: 'Vaccinations are crucial for preventing infectious diseases. Keep track of your and your family\'s vaccination schedules and ensure all doses are completed on time to build immunity.'
+                },
+                'malaria': {
+                    title: 'Malaria Prevention',
+                    content: 'To prevent malaria, use mosquito nets while sleeping. Apply mosquito repellent, wear protective clothing, and seek medical advice immediately if you experience fever, chills, or headache.'
+                },
+                'personal_hygiene': {
+                    title: 'Personal Hygiene',
+                    content: 'Maintaining personal hygiene is key to preventing many illnesses. Wash your hands regularly with soap and water, especially before meals. Keep your living spaces clean and tidy to avoid the spread of germs.'
+                }
+            };
+           
+            const tipDisplay = document.getElementById('tip-display');
+            const tipTitle = document.getElementById('tip-title');
+            const tipContent = document.getElementById('tip-content');
+           
+            if (tips[tipId]) {
+                tipTitle.innerText = tips[tipId].title;
+                tipContent.innerText = tips[tipId].content;
+                tipDisplay.classList.remove('hidden');
+                tipDisplay.classList.add('opacity-100');
+            } else {
+                tipDisplay.classList.add('hidden');
+                tipDisplay.classList.remove('opacity-100');
+            }
+        }
+
+        // Function to simulate sending SMS reminder
+        function sendSmsReminder() {
+            // A real implementation would require a backend API to send an SMS.
+            // This is a front-end simulation.
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            if (phoneNumber) {
+                showNotification(`SMS reminder sent to ${phoneNumber}!`);
+            } else {
+                showNotification('Please enter a phone number to send a reminder.');
+            }
+        }
+
+        // Function to open WhatsApp chat
+        function openWhatsAppChat() {
+            const whatsappNumber = "7569094704";
+            const message = "Hello Odisha Health Assistant, I have a question about my health.";
+            const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        // Initial page load, set the home page as active
+        document.addEventListener('DOMContentLoaded', () => {
+            showPage('home');
+            updateProgress();
+        });
+    </script>
+
 </body>
 </html>
